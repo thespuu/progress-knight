@@ -4,6 +4,7 @@ var gameData = {
 
     coins: 0,
     townFunds: 0,
+    townFundsInvestmentPerDay: 0,
     days: 365 * 14,
     evil: 0,
     paused: false,
@@ -846,8 +847,21 @@ function getIncome() {
 
 function increaseCoins() {
     var coins = applySpeed(getIncome());
-    gameData.coins += coins;
-    gameData.townFunds += 1;
+    var investmentPerDay = applySpeed(gameData.townFundsInvestmentPerDay);
+    gameData.coins += (coins - investmentPerDay);
+    gameData.townFunds += investmentPerDay;
+}
+
+function increaseTownFundInvestmentPerDay() {
+    gameData.townFundsInvestmentPerDay += 1000;
+}
+
+function decreaseTownFundInvestmentPerDay() {
+    gameData.townFundsInvestmentPerDay -= 1000;
+}
+
+function getTownInvestmentPerDay() {
+    return gameData.townFundsInvestmentPerDay;
 }
 
 function daysToYears(days) {
@@ -1193,6 +1207,7 @@ function updateUI() {
     updateHeaderRows(skillCategories)
     updateQuickTaskDisplay("job")
     updateQuickTaskDisplay("skill")
+    document.getElementById("townInvestmentDisplay").value = getTownInvestmentPerDay();
     hideEntities()
     updateText()
 }

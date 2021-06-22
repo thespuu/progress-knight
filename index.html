@@ -258,7 +258,9 @@
                     <div id="fundsForm">
                         <form>
                             <label for="fundsInput">Invest</label>
-                            <input type="text" name="fundsInput">
+                            <span><input type="button" onclick="decreaseTownFundInvestmentPerDay()" value="&lt;&lt;"></span>
+                            <input type="text" name="fundsInput" id="townInvestmentDisplay">
+                            <span><input type="button" onclick="increaseTownFundInvestmentPerDay()" value="&gt;&gt;"></span>
                         </form>
                     </div>
                 </div>
