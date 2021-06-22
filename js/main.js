@@ -3,6 +3,7 @@ var gameData = {
     itemData: {},
 
     coins: 0,
+    townFunds: 0,
     days: 365 * 14,
     evil: 0,
     paused: false,
@@ -751,24 +752,27 @@ function updateHeaderRows(categories) {
 
 function updateText() {
     //Sidebar
-    document.getElementById("ageDisplay").textContent = daysToYears(gameData.days)
-    document.getElementById("dayDisplay").textContent = getDay()
-    document.getElementById("lifespanDisplay").textContent = daysToYears(getLifespan())
-    document.getElementById("pauseButton").textContent = gameData.paused ? "Play" : "Pause"
+    document.getElementById("ageDisplay").textContent = daysToYears(gameData.days);
+    document.getElementById("dayDisplay").textContent = getDay();
+    document.getElementById("lifespanDisplay").textContent = daysToYears(getLifespan());
+    document.getElementById("pauseButton").textContent = gameData.paused ? "Play" : "Pause";
 
-    formatCoins(gameData.coins, document.getElementById("coinDisplay"))
-    setSignDisplay()
-    formatCoins(getNet(), document.getElementById("netDisplay"))
-    formatCoins(getIncome(), document.getElementById("incomeDisplay"))
-    formatCoins(getExpense(), document.getElementById("expenseDisplay"))
+    formatCoins(gameData.coins, document.getElementById("coinDisplay"));
+    setSignDisplay();
+    formatCoins(getNet(), document.getElementById("netDisplay"));
+    formatCoins(getIncome(), document.getElementById("incomeDisplay"));
+    formatCoins(getExpense(), document.getElementById("expenseDisplay"));
 
-    document.getElementById("happinessDisplay").textContent = getHappiness().toFixed(1)
+    // Town investment trust coin display
+    formatCoins(gameData.townFunds, document.getElementById("townFundDisplay"));
 
-    document.getElementById("evilDisplay").textContent = gameData.evil.toFixed(1)
-    document.getElementById("evilGainDisplay").textContent = getEvilGain().toFixed(1)
+    document.getElementById("happinessDisplay").textContent = getHappiness().toFixed(1);
 
-    document.getElementById("timeWarpingDisplay").textContent = "x" + gameData.taskData["Time warping"].getEffect().toFixed(2)
-    document.getElementById("timeWarpingButton").textContent = gameData.timeWarpingEnabled ? "Disable warp" : "Enable warp"
+    document.getElementById("evilDisplay").textContent = gameData.evil.toFixed(1);
+    document.getElementById("evilGainDisplay").textContent = getEvilGain().toFixed(1);
+
+    document.getElementById("timeWarpingDisplay").textContent = "x" + gameData.taskData["Time warping"].getEffect().toFixed(2);
+    document.getElementById("timeWarpingButton").textContent = gameData.timeWarpingEnabled ? "Disable warp" : "Enable warp";
 }
 
 function setSignDisplay() {
@@ -794,11 +798,27 @@ function hideEntities() {
     for (key in gameData.requirements) {
         var requirement = gameData.requirements[key]
         var completed = requirement.isCompleted()
-        for (element of requirement.elements) {
-            if (completed) {
-                element.classList.remove("hidden")
+        /*
+        * Added case of requirement.elements throwing a TypeError: requirement.elements is not iterable
+        * This error occured upon addition of Civics tab button and pulling the HTML element in the requirement
+        * by use of document.getElementById instead of getElementsByClass, which return different classes / interfaces.
+        * 
+        * June 22 2021
+        */
+        if(requirement.elements instanceof HTMLElement) {
+            if(completed) {
+                requirement.elements.classList.remove("hidden");
             } else {
-                element.classList.add("hidden")
+                requirement.elements.classList.add("hidden");
+            }
+            
+        } else {
+            for (element of requirement.elements) {
+                if (completed) {
+                    element.classList.remove("hidden");
+                } else {
+                    element.classList.add("hidden");
+                }
             }
         }
     }
@@ -825,31 +845,32 @@ function getIncome() {
 }
 
 function increaseCoins() {
-    var coins = applySpeed(getIncome())
-    gameData.coins += coins
+    var coins = applySpeed(getIncome());
+    gameData.coins += coins;
+    gameData.townFunds += 1;
 }
 
 function daysToYears(days) {
-    var years = Math.floor(days / 365)
-    return years
+    var years = Math.floor(days / 365);
+    return years;
 }
 
 function getCategoryFromEntityName(categoryType, entityName) {
     for (categoryName in categoryType) {
-        var category = categoryType[categoryName]
+        var category = categoryType[categoryName];
         if (category.includes(entityName)) {
-            return category
+            return category;
         }
     }
 }
 
 function getNextEntity(data, categoryType, entityName) {
-    var category = getCategoryFromEntityName(categoryType, entityName)
-    var nextIndex = category.indexOf(entityName) + 1
-    if (nextIndex > category.length - 1) return null
-    var nextEntityName = category[nextIndex]
-    var nextEntity = data[nextEntityName]
-    return nextEntity
+    var category = getCategoryFromEntityName(categoryType, entityName);
+    var nextIndex = category.indexOf(entityName) + 1;
+    if (nextIndex > category.length - 1) return null;
+    var nextEntityName = category[nextIndex];
+    var nextEntity = data[nextEntityName];
+    return nextEntity;
 }
 
 function autoPromote() {
@@ -884,7 +905,7 @@ function setSkillWithLowestMaxXp() {
             //This check on the requirement variable is here to handle the case of a skill
             //having no requirements. By setting requirement equal to Concentration's requirements, 
             //we prevent unchecked TypeErrors that have been breaking the auto learn feature. 
-            
+
             // NOTE : FRAGILE FIX
             // This fix will break if the Concentration skill is either removed from the game, renamed, or the requirement is no
             // longer immediately satisfied upon starting a new game. 
@@ -1227,6 +1248,8 @@ gameData.requirements = {
     "Dark magic": new EvilRequirement(getElementsByClass("Dark magic"), [{requirement: 1}]),
     "Shop": new CoinRequirement([document.getElementById("shopTabButton")], [{requirement: gameData.itemData["Tent"].getExpense() * 50}]),
     "Rebirth tab": new AgeRequirement([document.getElementById("rebirthTabButton")], [{requirement: 25}]),
+    "Civilization tab": new TaskRequirement(document.getElementById("civilizationTabButton"), [{task: "Baronet", requirement: 1}]),
+    //"Civics tab": new AgeRequirement([document.getElementById("civilizationTabButton")], [{requirement: 35}]),
     "Rebirth note 1": new AgeRequirement([document.getElementById("rebirthNote1")], [{requirement: 45}]),
     "Rebirth note 2": new AgeRequirement([document.getElementById("rebirthNote2")], [{requirement: 65}]),
     "Rebirth note 3": new AgeRequirement([document.getElementById("rebirthNote3")], [{requirement: 200}]),

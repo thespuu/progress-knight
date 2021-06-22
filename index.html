@@ -105,13 +105,20 @@
                     <div style="color: gray">Affects game speed</div>
                     <button id="timeWarpingButton" class="w3-button button sidebar-element" style="margin-top: 5px; width:150px" onClick="setTimeWarping()">Enable warp</button>
                 </span>
-            </div> <!-- End left-hand summary panel -->
+            </div> 
+            
+            <!--  End left-hand summary panel -->
+            <!--  *************************************************************************************************************************************************** -->
+            <!--  *************************************************************************************************************************************************** -->
+            <!--  *************************************************************************************************************************************************** -->
+
             
             <!--******* Nav-bar with tabbed content navigation buttons *******-->
             <div class="panel w3-margin-left" style="width: 900px; height: 40px; float: left">
                 <div class="w3-button w3-bar-item tabButton" id="jobTabButton" onClick="setTab(this, 'jobs')">Jobs</div>
                 <div class="w3-button w3-bar-item tabButton" onClick="setTab(this, 'skills')">Skills</div>
                 <div class="w3-button w3-bar-item tabButton" id="shopTabButton" onClick="setTab(this, 'shop')">Shop</div>
+                <div class="w3-button w3-bar-item tabButton" id="civilizationTabButton" onClick="setTab(this, 'civ')">Civics</div>
                 <div class="w3-button w3-bar-item tabButton" id="rebirthTabButton" onClick="setTab(this, 'rebirth')">Amulet</div>
                 <div class="w3-button w3-bar-item tabButton" onClick="setTab(this, 'settings')" style="float: right">Settings</div>
             </div> <!-- End nav-bar -->
@@ -207,6 +214,10 @@
                     </td> 
                 </template>
 
+                <!--  Navbar Tab definitions -->
+                <!--  *************************************************************************************************************************************************** -->
+                <!--  *************************************************************************************************************************************************** -->
+                <!--  *************************************************************************************************************************************************** -->
                 <div class="tab" id="jobs">
                     <table id="jobTable" class="w3-table w3-bordered">
                     </table>
@@ -222,6 +233,45 @@
                     </table>
                 </div>
 
+                <div class="tab" id="civ">
+                    <div class="panel" style="width: 868px; height: 40px; float: left">
+                        <div class="w3-button w3-bar-item tabButton" onClick="setTab(this, 'town')">Town</div>
+                        <div class="w3-button w3-bar-item tabButton" onClick="setTab(this, 'research')">Research</div>
+                    </div> <!-- End nav-bar -->
+                    <h1>Am I alive?</h1>
+                </div>
+
+                <div class="tab" id="town">
+                    <div class="panel" style="width: 868px; height: 40px; float: left">
+                        <div class="w3-button w3-bar-item tabButton" onClick="setTab(this, 'town')">Town</div>
+                        <div class="w3-button w3-bar-item tabButton" onClick="setTab(this, 'research')">Research</div>
+                    </div> <!-- End nav-bar -->
+
+                    <h1>Hello there! I'm the town advisor!</h1>
+                    <div style="font-size: large" id="townFundDisplay">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div style="color: gray">Balance (in coins)</div>
+                    <div id="fundsForm">
+                        <form>
+                            <label for="fundsInput">Invest</label>
+                            <input type="text" name="fundsInput">
+                        </form>
+                    </div>
+                </div>
+
+                <div class="tab" id="research">
+                    <div class="panel" style="width: 868px; height: 40px; float: left">
+                        <div class="w3-button w3-bar-item tabButton" onClick="setTab(this, 'town')">Town</div>
+                        <div class="w3-button w3-bar-item tabButton" onClick="setTab(this, 'research')">Research</div>
+                    </div> <!-- End nav-bar -->
+                    <h1>Research research research!</h1>
+                </div>
+
+                <!-- The "rebirth" tab renders as "Amulet" -->
                 <div class="tab" id="rebirth">
                     <ul>
                         <li style="margin: 8px;">

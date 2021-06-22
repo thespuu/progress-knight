@@ -2,17 +2,41 @@
 An incremental game developed by ihtasham42 and extended by Cameron Gott. Link to the game: https://ihtasham42.github.io/progress-knight/
 
 # dev-diary  
+6/22/2021  
+
+Begin local prototype of town / civilization feature.
+What it'll include:  
+-Unlocks after Baronet level 1  
+-Town, where the player can transfer their personal money into a town investment trust  
+-Buildings to build with said funds, including housing, farms, blacksmiths, merchant stores of various types, bank, and specialized  
+    buildings later on such as fortifications, parks, magical constructs, civilization-level military buildings like barracks, etc.  
+-Research tab to be unlocked after the completion of a certain building (Baron's Residence, Personal Library? Palace of magical doom? Something like that.)  
+    Research will be it's own separate feature development track. Combination of item-style unlocks and new skills to discover.
+-Town desirability, including the desirability of actually living there (this will modulate population growth)  
+-Town population  
+-Resources like food, wood, stone, etc similar to Evolve Idle's set up  
+-Development level, an aggregated score of a town's economic influence that will directly boost Nobility income and serve as a gate to certain events  
+
+That's all I can think of at this moment. I'm sure there will be more things and behavior to add, so designing for extension will be a key consideration.  
+
+First step: create a new navbar tab called Civilization (renamed Civics for button rendering and aesthetic matching)                    DONE!  
+Second step: within Civilization tab, create a nested navbar to hold      | Town | Research |  tabs.                                    DONE!
+Third step: Within Town tab, setup a simple form to transfer player cash to town fund.  
+3.1: add HTML to the Town tab to display townFundDisplay  
+3.2: add HTML to build the coin transfer form
 6/21/2021  
 
 Bug squashing was today's game. The bug in question was making a little bug nest inside the Auto Learn feature, rendering it completely useless and non-functional.  
 I'll talk a little bit about my thought process as I hunted down this bug, what I ultimately did to fix it and the tradeoffs considered and lessons learned.  
-
+  
 My initial thought was to look for low-hanging fruit. I skimmed the relevant code by using simple search and tracing the execution paths of all function calls  
 that deal with auto learn. This is a little bit tedious and inefficient, but it has an added benefit of building code confidence as this is still a relatively  
 new project to me. Specifically, I was looking for simple things like hard-coded loop end indices, hard-coded data structure sizes, anything that would break upon  
 the addition of new content. Shoutout to ihtasham42 / badassic, because I didn't find a single obvious poo-poo error. It was time to break out....  
 
 The Debugger!  
+  
+
 As soon as I crack open Chrome's devtools, I see a nice handy 1408 error messages. My first reaction was that I should've maybe started by opening devtools at the outset.  
 Ah well, live and learn. So all 1408 error messages were a TypeError inside of one of the functions I had looked at above. The game logic has a section of code that decides which  
 skill is next in line for auto learn. Inside of this function is a little snippet that checks whether the skill's requirements have been completed, because obviously we don't want  
