@@ -214,7 +214,7 @@
                     </td> 
                 </template>
 
-                <!--  Navbar Tab definitions -->
+                <!--  Tab definitions -->
                 <!--  *************************************************************************************************************************************************** -->
                 <!--  *************************************************************************************************************************************************** -->
                 <!--  *************************************************************************************************************************************************** -->
@@ -248,18 +248,19 @@
                     </div> <!-- End nav-bar -->
 
                     <h1>Hello there! I'm the town advisor!</h1>
-                    <div style="font-size: large" id="townFundDisplay">
+                    <span style="color: gray">Town Fund</span>
+                    <div id="townFundDisplay">
                         <span></span>
                         <span></span>
                         <span></span>
                         <span></span>
                     </div>
-                    <div style="color: gray">Balance (in coins)</div>
+                   
                     <div id="fundsForm">
                         <form>
                             <label for="fundsInput">Invest</label>
                             <span><input type="button" onclick="decreaseTownFundInvestmentPerDay()" value="&lt;&lt;"></span>
-                            <input type="text" name="fundsInput" id="townInvestmentDisplay">
+                            <input type="text" name="fundsInput" id="townInvestmentDisplay" readonly>
                             <span><input type="button" onclick="increaseTownFundInvestmentPerDay()" value="&gt;&gt;"></span>
                         </form>
                     </div>

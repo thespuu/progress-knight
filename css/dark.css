@@ -21,3 +21,8 @@
     background-color: rgb(82, 82, 82) !important;
     color: white !important
 }
+
+#townFundDisplay {
+    display: inline-block;
+    font-size: large;
+}

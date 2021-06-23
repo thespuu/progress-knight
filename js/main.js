@@ -480,8 +480,9 @@ function applyExpenses() {
 }
 
 function getExpense() {
-    var expense = 0
-    expense += gameData.currentProperty.getExpense()
+    var expense = 0;
+    expense += gameData.currentProperty.getExpense();
+    expense += gameData.townFundsInvestmentPerDay;
     for (misc of gameData.currentMisc) {
         expense += misc.getExpense()
     }
@@ -764,8 +765,11 @@ function updateText() {
     formatCoins(getIncome(), document.getElementById("incomeDisplay"));
     formatCoins(getExpense(), document.getElementById("expenseDisplay"));
 
-    // Town investment trust coin display
+    // Town investment trust-fund balance coin display
     formatCoins(gameData.townFunds, document.getElementById("townFundDisplay"));
+    //Text input inner display 
+    document.getElementById("townInvestmentDisplay").value = formatCopperCoinsToHigherValueCoins(getTownInvestmentPerDay());
+    
 
     document.getElementById("happinessDisplay").textContent = getHappiness().toFixed(1);
 
@@ -840,15 +844,15 @@ function doCurrentTask(task) {
 }
 
 function getIncome() {
-    var income = 0
-    income += gameData.currentJob.getIncome()
-    return income
+    var income = 0;
+    income += gameData.currentJob.getIncome();
+    return income;
 }
 
 function increaseCoins() {
     var coins = applySpeed(getIncome());
     var investmentPerDay = applySpeed(gameData.townFundsInvestmentPerDay);
-    gameData.coins += (coins - investmentPerDay);
+    gameData.coins += (coins);
     gameData.townFunds += investmentPerDay;
 }
 
@@ -1011,6 +1015,7 @@ function formatCoins(coins, element) {
         var x = Math.floor(leftOver / Math.pow(10, (tiers.length - i) * 2))
         var leftOver = Math.floor(leftOver - x * Math.pow(10, (tiers.length - i) * 2))
         var text = format(String(x)) + tier + " "
+        //element.children refers to one of four inner <span> tags that are used to color the coin displays
         element.children[i].textContent = x > 0 ? text : ""
         element.children[i].style.color = colors[tier]
         i += 1
@@ -1019,6 +1024,39 @@ function formatCoins(coins, element) {
     var text = String(Math.floor(leftOver)) + "c"
     element.children[3].textContent = text
     element.children[3].style.color = colors["c"]
+}
+
+/*
+*   Function:   formatCopperCoinsToHigherValueCoins returns String
+*
+*   What:       takes a raw decimal value input argument, such as 1000, and returns a string
+*               representing that value in terms of silver, gold, platinum and copper coins. 
+*               
+*   Example:    formatCopperCoinsToHigherValueCoins(1000) returns "10s"
+*   Example:    formatCopperCoinsToHigherValueCoins(10000) returns "1g"
+*   Example:    formatCopperCoinsToHigherValueCoins(11000) returns "1g 10s"
+*   Example:    formatCopperCoinsToHigherValueCoins(1,011,000) returns "1g 10s"
+*/
+function formatCopperCoinsToHigherValueCoins(coinsInPureDecimalValue) {
+    var endResultString = "";
+    var tiers = ["p", "g", "s"];
+    var remainingCopper = coinsInPureDecimalValue;
+    var i = 0;
+    for(tier of tiers) {
+        var x = Math.floor(remainingCopper / Math.pow(10, (tiers.length - i) * 2));
+        remainingCopper = Math.floor(remainingCopper - x * Math.pow(10, (tiers.length - i) * 2));
+        var textFragment = format(String(x) + tier + " ");
+        endResultString = (x > 0) ? endResultString + textFragment : endResultString;
+        i++;
+    }
+    //If there is a remainder, they're copper. If no remainder, return the result string as-is.
+    if (remainingCopper == 0 && coinsInPureDecimalValue > 0) {
+        return endResultString;
+    } else {
+        var textFragment = String(Math.floor(remainingCopper)) + "c";
+        endResultString += textFragment;
+        return endResultString;
+    }
 }
 
 function getTaskElement(taskName) {
@@ -1067,26 +1105,28 @@ function rebirthTwo() {
 }
 
 function rebirthReset() {
-    setTab(jobTabButton, "jobs")
+    setTab(jobTabButton, "jobs");
 
-    gameData.coins = 0
-    gameData.days = 365 * 14
-    gameData.currentJob = gameData.taskData["Beggar"]
-    gameData.currentSkill = gameData.taskData["Concentration"]
-    gameData.currentProperty = gameData.itemData["Homeless"]
-    gameData.currentMisc = []
+    gameData.coins = 0;
+    gameData.townFundsInvestmentPerDay = 0;
+    gameData.days = 365 * 14;
+    gameData.currentJob = gameData.taskData["Beggar"];
+    gameData.currentSkill = gameData.taskData["Concentration"];
+    gameData.currentProperty = gameData.itemData["Homeless"];
+    gameData.currentMisc = [];
 
     for (taskName in gameData.taskData) {
-        var task = gameData.taskData[taskName]
-        if (task.level > task.maxLevel) task.maxLevel = task.level
-        task.level = 0
-        task.xp = 0
+        var task = gameData.taskData[taskName];
+        if (task.level > task.maxLevel) task.maxLevel = task.level;
+        task.level = 0;
+        task.xp = 0;
     }
 
     for (key in gameData.requirements) {
-        var requirement = gameData.requirements[key]
-        if (requirement.completed && permanentUnlocks.includes(key)) continue
-        requirement.completed = false
+        var requirement = gameData.requirements[key];
+        if (requirement.completed && permanentUnlocks.includes(key))
+            continue;
+        requirement.completed = false;
     }
 }
 
@@ -1207,7 +1247,6 @@ function updateUI() {
     updateHeaderRows(skillCategories)
     updateQuickTaskDisplay("job")
     updateQuickTaskDisplay("skill")
-    document.getElementById("townInvestmentDisplay").value = getTownInvestmentPerDay();
     hideEntities()
     updateText()
 }
@@ -1402,3 +1441,20 @@ update()
 setInterval(update, 1000 / updateSpeed)
 setInterval(saveGameData, 3000)
 setInterval(setSkillWithLowestMaxXp, 1000)
+
+/*
+*       Currency Conversion Chart
+*       
+*       
+*       1s  =   100c
+*       10s =   1,000c
+*       1g  =   100s
+*       1g  =   10,000c
+*       10g =   1,000s
+*       10g =   100,000c
+*       1p  =   100g
+*       1p  =   10,000s
+*       1p  =   1,000,000c
+*
+*       Tip: each coin name is two orders of magnitude higher than the previous coin
+*/

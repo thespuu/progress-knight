@@ -22,8 +22,17 @@ That's all I can think of at this moment. I'm sure there will be more things and
 First step: create a new navbar tab called Civilization (renamed Civics for button rendering and aesthetic matching)                    DONE!  
 Second step: within Civilization tab, create a nested navbar to hold      | Town | Research |  tabs.                                    DONE!
 Third step: Within Town tab, setup a simple form to transfer player cash to town fund.  
-3.1: add HTML to the Town tab to display townFundDisplay  
-3.2: add HTML to build the coin transfer form
+3.1: add HTML to the Town tab to display townFundDisplay                                                                                DONE!
+3.2: add gameData.townFunds to store the town funds                                                                                     DONE!
+3.3: hook up any town expenses to the applyExpenses function
+3.4: hook up goBankrupt() logic to town funds (decide how to handle this)
+3.5: hook up the funds transfer form to increaseCoins() function                                                                        DONE!
+3.6: 
+3.3: add HTML to build the coin transfer form                                                                                           DONE!
+3.3: enable support for depositing and withdrawing coins from town fund                                                                 DONE!
+3.3: write function to enable investment buttons to change townFundsInvestmentPerDay                                                    DONE!
+3.3: link up investmentPerDay to the quickDisplay's Net, Balance, and other coin displays
+3.3: set the text input box to display the current value of investmentperday                                                            DONE!
 6/21/2021  
 
 Bug squashing was today's game. The bug in question was making a little bug nest inside the Auto Learn feature, rendering it completely useless and non-functional.  
