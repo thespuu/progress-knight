@@ -543,8 +543,8 @@ function setMisc(miscName) {
 
 function createData(data, baseData) {
     for (key in baseData) {
-        var entity = baseData[key]
-        createEntity(data, entity)
+        var entity = baseData[key];
+        createEntity(data, entity);
     }
 }
 

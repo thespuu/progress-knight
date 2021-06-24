@@ -2,6 +2,15 @@
 An incremental game developed by ihtasham42 and extended by Cameron Gott. Link to the game: https://ihtasham42.github.io/progress-knight/
 
 # dev-diary  
+6/23/2021  
+-format coin display inside investment toggle box
+-write new formatCoins() function to enable better reusability by removing some input dependencies and assumptions
+-change investment box to readonly
+-Set town fund display to the proper name "Town Fund"
+-Pulled HTML inline-style from the town's fund display into dark.css
+-Changed town fund display to be inline for space savings and aesthetics
+-set daily town investment to zero on rebirth
+-fixed bug where town investment funds are subtracted twice
 6/22/2021  
 
 Begin local prototype of town / civilization feature.
@@ -24,15 +33,15 @@ Second step: within Civilization tab, create a nested navbar to hold      | Town
 Third step: Within Town tab, setup a simple form to transfer player cash to town fund.  
 3.1: add HTML to the Town tab to display townFundDisplay                                                                                DONE!
 3.2: add gameData.townFunds to store the town funds                                                                                     DONE!
-3.3: hook up any town expenses to the applyExpenses function
-3.4: hook up goBankrupt() logic to town funds (decide how to handle this)
+3.3: hook up any town investment fund transfers to the applyExpenses function                                                           DONE!
+3.4: hook up goBankrupt() logic to town funds (decide how to handle this)                                                               DONE!
 3.5: hook up the funds transfer form to increaseCoins() function                                                                        DONE!
 3.6: 
-3.3: add HTML to build the coin transfer form                                                                                           DONE!
-3.3: enable support for depositing and withdrawing coins from town fund                                                                 DONE!
-3.3: write function to enable investment buttons to change townFundsInvestmentPerDay                                                    DONE!
-3.3: link up investmentPerDay to the quickDisplay's Net, Balance, and other coin displays
-3.3: set the text input box to display the current value of investmentperday                                                            DONE!
+3.7: add HTML to build the coin transfer form                                                                                           DONE!
+3.8: enable support for depositing and withdrawing coins from town fund                                                                 DONE!
+3.9: write function to enable investment buttons to change townFundsInvestmentPerDay                                                    DONE!
+3.10: link up investmentPerDay to the quickDisplay's Net, Balance, and other coin displays
+3.11: set the text input box to display the current value of investmentperday                                                            DONE!
 6/21/2021  
 
 Bug squashing was today's game. The bug in question was making a little bug nest inside the Auto Learn feature, rendering it completely useless and non-functional.  
