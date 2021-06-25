@@ -2,6 +2,34 @@
 An incremental game developed by ihtasham42 and extended by Cameron Gott. Link to the game: https://ihtasham42.github.io/progress-knight/
 
 # dev-diary  
+6/24/2021  
+
+*** Planning for Town ***  
+The new Town feature is going to need a lot of code touching a lot of different core game systems.  
+Thinking about it all at once is a little overwhelming, so it's time to dig in and plan out the systems required.  
+
+Goal:  one building, Wooden Hut, that houses one person per building.  
+        This building will render into the Town tab under Civics as a button. 
+        Each building will have a cost associated with it. Likely start at 1p, grow at 0.3% per additional Hut.
+        In addition to a button, each building will need to display a counter of how many have been built. 
+        I could do this as a card-style div element similar to Evolve, where the number is inside the button. 
+        A tooltip will display upon mouse hover to show a short description and the cost of the next building. 
+        Each wooden hut will create a paltry income, on the order of coppers per day. This income needs to be added to the
+        game's getIncome() system.
+        Buildings will have a splendor / "fancy" score that will feed into the overall Town reputation and power.
+        Town reputation and power will have a direct influence on progress through the Nobility tree, including 
+        xp gain and income from jobs. 
+        Buildings will not have a maintenance cost, as its assumed to be self sufficient. 
+        Any effects from buildings must be gated by unlocking Nobility in the next reincarnation.
+        But future upgrades may allow reincarnating as an heir, thus immediately gaining income from your ancestor's legacy.  
+
+Code to Touch:  
+-create new Building class to support behavior described above.
+-create new BuildingRequirement class  
+-store Building unlock requirements as a data structure inside Building class (each Building should know it's own unlock requirements)
+-create new HTML template for Building button
+-create a new instantiateBuildingObjects() function to act similarly to existing createData() function
+
 6/23/2021  
 -format coin display inside investment toggle box
 -write new formatCoins() function to enable better reusability by removing some input dependencies and assumptions
