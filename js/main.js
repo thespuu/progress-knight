@@ -17,7 +17,11 @@ var gameData = {
     currentSkill: null,
     currentProperty: null,
     currentMisc: null,
-}
+};
+
+var townData = {
+    buildingObjects: {}
+};
 
 var tempData = {}
 
@@ -836,6 +840,23 @@ function createItemData(baseData) {
     }
 }
 
+/* Traverse through const buildingDefinitions.
+* For each key in buildingDefinitions, pass the value into
+* the TownBuilding constructor and save the returned object into the buildingData object.
+*/
+function initializeBuildingObjects() {
+
+     try {
+        for (buildingDefinition in buildingDefinitions) {
+            townData.buildingObjects[buildingDefinition.buildingName] = (new TownBuilding(buildingDefinition));
+        }
+    }
+    catch(e) {
+        alert("there was an error initializating building objects from their definitions");
+    } 
+    
+}
+
 function doCurrentTask(task) {
     task.increaseXp()
     if (task instanceof Job) {
@@ -1287,7 +1308,10 @@ createAllRows(itemCategories, "itemTable")
 
 createData(gameData.taskData, jobBaseData)
 createData(gameData.taskData, skillBaseData)
-createData(gameData.itemData, itemBaseData) 
+createData(gameData.itemData, itemBaseData)
+initializeBuildingObjects(); 
+
+linkEventHandlersToHTMLElements();
 
 gameData.currentJob = gameData.taskData["Beggar"]
 gameData.currentSkill = gameData.taskData["Concentration"]

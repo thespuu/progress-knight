@@ -2,6 +2,18 @@
 An incremental game developed by ihtasham42 and extended by Cameron Gott. Link to the game: https://ihtasham42.github.io/progress-knight/
 
 # dev-diary  
+
+6/26/2021  
+Time to pivot to event-based architecture.
+Floated elements remain within the content-area of their containing elements.
+Set display: inline-block to allow townButtonCards to sit next to each other.
+Actually, scratch that last. I think the smart way to go is to use Flexbox, as this is exactly what Flexbox is designed for and saves me lots of fiddling around  
+with CSS margins and floats.
+
+First button rough draft is done.  
+Now to make it do something.  
+Added event listener to buliding button.
+Writing event handler for wooden hut button click event.
 6/24/2021  
 
 *** Planning for Town ***  

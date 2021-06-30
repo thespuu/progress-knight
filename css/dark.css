@@ -26,3 +26,38 @@
     display: inline-block;
     font-size: large;
 }
+
+.townBuildingCard {
+    display: flex;
+    flex-flow: row wrap;
+    margin-bottom: 1em;
+    margin-top: 0em;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    padding-right: 1.5em;
+    padding-left: 1.5em;
+    background-color: -internal-light-dark(rgb(239, 239, 239), rgb(59, 59, 59));
+}
+
+.townBuildingButton {
+    font-size: small;
+    border: none;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    padding-right: 2em;
+    padding-left: 2em; 
+}
+
+
+.townBuildingCard .buildingCounter {
+    
+    width: fit-content;
+    font-size: 10;
+    line-height: 0.5;
+    padding-top: 0em;
+    padding-bottom: 1em;
+    margin-top: 0em;
+    margin-bottom: 0em;
+    color:rgb(31, 31, 31);
+    background-color: white;
+}
