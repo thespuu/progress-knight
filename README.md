@@ -2,6 +2,24 @@
 An incremental game developed by ihtasham42 and extended by Cameron Gott. Link to the game: https://ihtasham42.github.io/progress-knight/
 
 # dev-diary  
+7/6/2021
+
+Fix issue where TownBuilding objects were not instantiating properly during game setup.
+Fill out event behavior when Wooden Hut gets clicked.  
+Link UI to reflect number of active buildings. 
+Add town population change to wooden hut purchase event.
+Add town pop counter to HTML.
+Link town pop counter to townData.townPopCapacity in the updateText() call.
+Save townData to localStorage.
+Fix bug where building initialization is overwriting saved data.
+Fix bug where TownBuilding objects weren't instantiating properly when loading from a saved game.
+
+Today I learned that for each loops that iterate through an object of key-value pairs in Javascript  
+will grab only the key, and that I myself need to use that key to grab the associated value inside of the for each body.  
+Pesky C++ and Java assumptions screwing me over in JS-land once again. 
+
+Changelog:
+Wooden Hut buildings now can be purchased and reflect their current state in the UI as expected. 
 
 6/26/2021  
 Time to pivot to event-based architecture.

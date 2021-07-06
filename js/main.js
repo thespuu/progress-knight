@@ -20,7 +20,8 @@ var gameData = {
 };
 
 var townData = {
-    buildingObjects: {}
+    buildingObjects: {},
+    townPopCapacity: 0,
 };
 
 var tempData = {}
@@ -773,6 +774,12 @@ function updateText() {
     formatCoins(gameData.townFunds, document.getElementById("townFundDisplay"));
     //Text input inner display 
     document.getElementById("townInvestmentDisplay").value = formatCopperCoinsToHigherValueCoins(getTownInvestmentPerDay());
+
+    // *** REFACTOR TO SEPARATE FUNCTION ***
+    //update building button counters
+    var woodenHutCounterParagraph = document.querySelector("#counter-woodenHut p");
+    woodenHutCounterParagraph.innerHTML = townData.buildingObjects["Wooden Hut"].currentActiveBuildings;
+    var townPopCounter = document.querySelector("#townPopulationCounter").innerHTML = "Population: " + townData.townPopCapacity;
     
 
     document.getElementById("happinessDisplay").textContent = getHappiness().toFixed(1);
@@ -847,14 +854,22 @@ function createItemData(baseData) {
 function initializeBuildingObjects() {
 
      try {
-        for (buildingDefinition in buildingDefinitions) {
-            townData.buildingObjects[buildingDefinition.buildingName] = (new TownBuilding(buildingDefinition));
+        for (buildingKey in buildingDefinitions) {
+            console.log(buildingKey);
+            buildingDefinition = buildingDefinitions[buildingKey];
+            console.log(buildingDefinition);
+            townData.buildingObjects[buildingKey] = (new TownBuilding(buildingDefinition));
         }
     }
     catch(e) {
         alert("there was an error initializating building objects from their definitions");
     } 
+    console.log(townData.buildingObjects);
     
+}
+
+function initializeTownPopulationCapacity() {
+    townData.townPopCapacity = (townData.buildingObjects["Wooden Hut"].currentActiveBuildings * townData.buildingObjects["Wooden Hut"].popCapacity);
 }
 
 function doCurrentTask(task) {
@@ -1122,7 +1137,14 @@ function rebirthTwo() {
     for (taskName in gameData.taskData) {
         var task = gameData.taskData[taskName]
         task.maxLevel = 0
-    }    
+    }
+    
+    //wipe out town
+    gameData.townFunds = 0;
+    gameData.townFundsInvestmentPerDay = 0;
+    //resets town buildings by recreating all the objects from their base definitions
+    initializeBuildingObjects();
+    townData.townPopCapacity = 0;    
 }
 
 function rebirthReset() {
@@ -1240,22 +1262,38 @@ function replaceSaveDict(dict, saveDict) {
 }
 
 function saveGameData() {
-    localStorage.setItem("gameDataSave", JSON.stringify(gameData))
+    localStorage.setItem("gameDataSave", JSON.stringify(gameData));
+    localStorage.setItem("townDataSave", JSON.stringify(townData));
 }
 
 function loadGameData() {
-    var gameDataSave = JSON.parse(localStorage.getItem("gameDataSave"))
+    var gameDataSave = JSON.parse(localStorage.getItem("gameDataSave"));
+    var townDataSave = JSON.parse(localStorage.getItem("townDataSave"));
 
     if (gameDataSave !== null) {
-        replaceSaveDict(gameData, gameDataSave)
-        replaceSaveDict(gameData.requirements, gameDataSave.requirements)
-        replaceSaveDict(gameData.taskData, gameDataSave.taskData)
-        replaceSaveDict(gameData.itemData, gameDataSave.itemData)
+        replaceSaveDict(gameData, gameDataSave);
+        replaceSaveDict(gameData.requirements, gameDataSave.requirements);
+        replaceSaveDict(gameData.taskData, gameDataSave.taskData);
+        replaceSaveDict(gameData.itemData, gameDataSave.itemData);
 
-        gameData = gameDataSave
+        gameData = gameDataSave;
     }
 
-    assignMethods()
+    if(townDataSave !== null) {
+        //  *** TO DO ***
+        //write function to instantiate all TownBuildings automatically
+        townData.buildingObjects["Wooden Hut"] = new TownBuilding(townDataSave.buildingObjects["Wooden Hut"]);
+        townData.townPopCapacity = townDataSave.townPopCapacity;
+       
+        //replaceSaveDict(townData, townDataSave);
+        //replaceSaveDict(townData.buildingObjects, townDataSave.buildingObjects);
+        //townData = townDataSave;
+    } else {
+        initializeBuildingObjects(); 
+        initializeTownPopulationCapacity();
+    }
+
+    assignMethods();
 }
 
 function updateUI() {
@@ -1302,16 +1340,13 @@ function exportGameData() {
 
 //Init
 
-createAllRows(jobCategories, "jobTable")
-createAllRows(skillCategories, "skillTable")
-createAllRows(itemCategories, "itemTable") 
+createAllRows(jobCategories, "jobTable");
+createAllRows(skillCategories, "skillTable");
+createAllRows(itemCategories, "itemTable");
 
-createData(gameData.taskData, jobBaseData)
-createData(gameData.taskData, skillBaseData)
-createData(gameData.itemData, itemBaseData)
-initializeBuildingObjects(); 
-
-linkEventHandlersToHTMLElements();
+createData(gameData.taskData, jobBaseData);
+createData(gameData.taskData, skillBaseData);
+createData(gameData.itemData, itemBaseData);
 
 gameData.currentJob = gameData.taskData["Beggar"]
 gameData.currentSkill = gameData.taskData["Concentration"]
@@ -1460,7 +1495,7 @@ setCustomEffects()
 addMultipliers()
 
 setTab(jobTabButton, "jobs")
-
+linkEventHandlersToHTMLElements();
 update()
 setInterval(update, 1000 / updateSpeed)
 setInterval(saveGameData, 3000)

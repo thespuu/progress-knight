@@ -26,7 +26,13 @@ class TownBuilding {
     purchaseBuilding() {
         gameData.coins -= this.baseCost;
         this.currentActiveBuildings++;
-        
+
+    }
+
+    calculateCostOfNextBuilding() {
+        var cost = 0;
+        cost = this.baseCost * (Math.pow(this.costGrowthFactor, this.currentActiveBuildings));
+        return cost;
     }
     
 }

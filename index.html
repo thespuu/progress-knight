@@ -248,7 +248,9 @@
                     <h1>Am I alive?</h1>
                 </div>
 
+                <!--  ****************                  TOWN                    ****************-->
                 <div class="tab" id="town">
+
                     <div class="panel" style="width: 868px; height: 40px; float: left">
                         <div class="w3-button w3-bar-item tabButton" onClick="setTab(this, 'town')">Town</div>
                         <div class="w3-button w3-bar-item tabButton" onClick="setTab(this, 'research')">Research</div>
@@ -256,12 +258,14 @@
 
                     <h1>Hello there! I'm the town advisor!</h1>
                     <span style="color: gray">Town Fund</span>
+                    
                     <div id="townFundDisplay">
                         <span></span>
                         <span></span>
                         <span></span>
                         <span></span>
                     </div>
+                    <span id="townPopulationCounter">Population: 0</span>
                    
                     <div id="fundsForm">
                         <form>
@@ -274,7 +278,7 @@
                     <div class="townBuildingCard">
                         
                         <button type="button" class="townBuildingButton" id="button-woodenHut">Wooden Hut</button>
-                        <div class="buildingCounter"><p>0</p></div>
+                        <div class="buildingCounter" id="counter-woodenHut"><p>0</p></div>
                     </div>
                     
                 </div>
