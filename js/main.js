@@ -1339,9 +1339,18 @@ function update() {
     updateUI()
 }
 
-function resetGameData() {
+/*function resetGameData() {
     localStorage.clear()
     location.reload()
+}
+*/
+function resetGameData() {
+	var result = confirm("Are you sure you want to reset your game?"):
+	if (result) {
+		localStorage.clear();
+		location.reload();
+	}
+	
 }
 
 function importGameData() {
