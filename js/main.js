@@ -1,7 +1,8 @@
 var gameData = {
     taskData: {},
     itemData: {},
-
+    townData: {},
+    rawTownIncome: 0,
     coins: 0,
     days: 365 * 14,
     evil: 0,
@@ -17,8 +18,10 @@ var gameData = {
     currentMisc: null,
 }
 
+//tempData is used during initial game setup. 
 var tempData = {}
 
+//used for Auto Learn skill switching logic
 var skillWithLowestMaxXp = null
 
 const autoPromoteElement = document.getElementById("autoPromote")
@@ -28,7 +31,7 @@ const updateSpeed = 20
 
 const baseLifespan = 365 * 70
 
-//Turn on devmode: 1
+//Turn on devmode:  1
 //Turn off devmode: 0
 var devModeFastProgress = 0;
 // ******* DEV MODE SPEED INCREASES ******* //
@@ -39,6 +42,8 @@ if(devModeFastProgress == 1) {
     baseGameSpeed = 32;
     baseEffect = 100;
 }
+
+const enableVerboseLogging = 0;
 
 const permanentUnlocks = ["Scheduling", "Shop", "Automation", "Quick task display"]
 
@@ -129,6 +134,18 @@ const skillBaseData = {
     
 }
 
+const projectBaseData = {
+    "Labratorium Arcaenus": {
+        name: "Labratorium Arcaenus", 
+        jobAffected: "Chairman", 
+        jobCategoriesAffected: "The Arcane Association",
+        xpMultiplier: 1.05,
+        baseCost: 1000000000000000, //One million platinum
+        persistsThroughRebirthOne: true,
+        rebirthTwoDestructionPenalty: 0.9,  // embracing evil destroys 90 percent of the project's value
+    },
+}
+
 const itemBaseData = {
     "Homeless": {name: "Homeless", expense: 0, effect: 1},
     "Tent": {name: "Tent", expense: 15, effect: 1.4},
@@ -157,6 +174,7 @@ const itemBaseData = {
     "Cheap Fishing Rod": {name: "Cheap Fishing Rod", expense: 20, effect: 2.0, description: "Fishing upgrade"},
     "Miner's Lantern": {name: "Miner's Lantern", expense: 35, effect: 1.5, description: "Mining upgrade"},
     "Crappy Anvil": {name: "Crappy Anvil", expense: 50, effect: 1.5, description: "Blacksmith upgrade"},
+    "Breech Bellows": {name: "Breech Bellows", expense: 130, effect: 1.8, description: "Blacksmith upgrade"},
     "Pack Horse": {name: "Pack Horse", expense: 80, effect: 3.0, description: "Merchant upgrade"},
     "Small Shop": {name: "Small Shop", expense: 600, effect: 1.5, description: "Merchant upgrade"},
     "Weapon Outlet": {name: "Weapon Outlet", expense: 3000, effect: 3.0, description: "Merchant upgrade"},
@@ -181,9 +199,13 @@ const skillCategories = {
 
 const itemCategories = {
     "Properties": ["Homeless", "Tent", "Wooden hut", "Cottage", "House", "Large house", "Small Manor", "Small palace", "Grand palace"],
-    "Misc": ["Rag Clothing", "Book", "Basic Farm Tools", "Small Field", "Ox-driven Plow", "Livestock-derived Fertilizer", "Cheap Fishing Rod", "Dumbbells", "Miner's Lantern", "Crappy Anvil", "Pack Horse", "Small Shop",
+    "Misc": ["Rag Clothing", "Book", "Basic Farm Tools", "Small Field", "Ox-driven Plow", "Livestock-derived Fertilizer", "Cheap Fishing Rod", "Dumbbells", "Miner's Lantern", "Crappy Anvil", "Breech Bellows", "Pack Horse", "Small Shop",
     "Weapon Outlet", "Personal squire", 
                 "Steel longsword", "Butler", "Sapphire charm", "Study desk", "Library"]
+}
+
+const projectCategories = {
+    "Chairman Projects": ["Labratorium Arcaenus"]
 }
 
 const headerRowColors = {
@@ -223,17 +245,17 @@ const tooltips = {
     "Mage": "Turn the tides of battle through casting intermediate spells and mentor other apprentices. The pay for this particular job is extremely high.",
     "Wizard": "Utilise advanced spells to ravage and destroy entire legions of enemy soldiers. Only a small percentage of mages deserve to attain this role and are rewarded with an insanely high pay.",
     "Master wizard": "Blessed with unparalleled talent, perform unbelievable feats with magic at will. It is said that a master wizard has enough destructive power to wipe an empire off the map.",
-    "Chairman": "Spend your days administrating The Arcane Association and investigate the concepts of true immortality. The chairman receives ludicrous amounts of pay daily.",
+    "Chairman": "As you walk amongst your fellow Master Wizards, who in recognition of your vast power have just elected you Chairman of the Arcane Association, you receive this anonymous note: \"We have followed your progress with great interest. Many have walked this path, but few have used the amulet you now wear to its full potential. But you are not the first to make it this far. Strive on. We will contact you, when the time is right.\"",
     "Illustrious Chairman": "Master of life and war. Renowned throughout the magical and non-magical worlds alike, an Illustrious Chairman is completely free to follow their own path of discovery and ambition. On the other hand, there is that curious note to investigate...",
 
     //The Order of Discovery
     "Junior Caretaker": "A low-level administrator of the ancient Order of Discovery has offered you a job. Cleaning shit-stained chamber pots and mopping kitchen floors isn't glamorous work, but it gives you the rare chance to peruse the Order's world-class library of exotic books. Who cares if touching the books is an offense worthy of expulsion?",
     "Lead Caretaker": "Witty placeholder, my name is.",
-    "Freshman": "I tip the tools, and inform the fools.",
+    "Freshman": "Your leadership of the caretaking team has proven you have a modicum of brain cells. A teacher you frequently see has vouched for your potential. Your studies are long and often boring, but you can sense there are great secrets within these halls waiting to be discovered.",
     "Sophomore": "Rhyming is crime-ing, and feature delay is not the way.",
     "Junior": "Try as I do, these temporary tooltips are poo.",
     "Senior": "Forget me not, for this author shall not.",
-    "Probation": "A tooltip a day, keeps the passionate fan at bay.",
+    "Probation": "Having completed your basic studies, the Order grants you a bottom-of-the-barrel position as research associate to an old member of little renown. Any major misstep will probably result in your banishment from the halls of knowledge.",
 
     //Nobility
     "Baronet": "A tooltip, a thought. Helpful, I am not.",
@@ -254,6 +276,7 @@ const tooltips = {
     "Bargaining": "Study the tricks of the trade and persuasive skills to lower any type of expense.",
     "Meditation": "Fill your mind with peace and tranquility to tap into greater happiness from within.",
 
+    //Military
     "Strength": "Condition your body and strength through harsh training. Stronger individuals are paid more in the military.",
     "Battle tactics": "Create and revise battle strategies, improving experience gained in the military.",
     "Muscle memory": "Strengthen your neurons through habit and repetition, improving strength gains throughout the body.",
@@ -307,6 +330,7 @@ const tooltips = {
     "Dumbbells": "Heavy tools used in strenuous exercise to toughen up and accumulate strength even faster than before. ",
     "Miner's Lantern": "After weeks of feeling your way through pitch black tunnels, bandaging scraped hands, and getting smacked in the face by your fellow miner's pickaxes, you have the bright idea to purchase a lantern. Hopefully some light will help illuminate additional mineral deposits and geological phenomena.",
     "Crappy Anvil": "You're pretty sure this lumpy hunk of iron used to be someone's chamber pot.",
+    "Breech Bellows": "Cobbled together with two sticks and a pair of old trousers, this tool boosts the heat and efficiency of your forge.",
     "Pack Horse": "This sweet chestnut horse will haul you and your trade goods to distant cities where your novel fabrics and knick knacks will fetch a tidy profit.",
     "Small Shop": "Your first shop. This cozy storefront lies on the main street of a medium-sized walled town. Commoners, nobles, and military patrols all pass along this street, so at the very least people will know your store exists.",
     "Weapon Outlet": "A busy military means a busy weapons store. One of the liuetenants who frequents your small shop recently let slip that a long military campaign is imminent. Naturally, a savy merchant such as yourself sees the business opportunity provided by war.",
@@ -388,6 +412,8 @@ function addMultipliers() {
         } else if (task.name == "Blacksmith") { //crappy anvil boosts income and xp of blacksmith by 1.5x
             task.incomeMultipliers.push(getBindedItemEffect("Crappy Anvil"));
             task.xpMultipliers.push(getBindedItemEffect("Crappy Anvil"));
+            task.incomeMultipliers.push(getBindedItemEffect("Breech Bellows"));
+            task.xpMultipliers.push(getBindedItemEffect("Breech Bellows"));
         } else if (task.name == "Merchant") {
             task.incomeMultipliers.push(getBindedItemEffect("Pack Horse"));
             task.incomeMultipliers.push(getBindedTaskEffect("Trade Psychology"));
@@ -414,12 +440,16 @@ function addMultipliers() {
             task.xpMultipliers.push(getBindedTaskEffect("Novel Knowledge"));
             task.xpMultipliers.push(getBindedTaskEffect("Unusual Insight"));
             task.xpMultipliers.push(getBindedTaskEffect("Scales Of Thought"));
-        } else if (jobCategories["The Arcane Association"].includes(task.name)) {
+        } else if (skillCategories["Dark magic"].includes(task.name)) {
+            task.xpMultipliers.push(getEvil)
+        }
+        if (jobCategories["The Arcane Association"].includes(task.name)) {
             task.xpMultipliers.push(getBindedTaskEffect("Mana control"));
             task.xpMultipliers.push(getBindedTaskEffect("Novel Knowledge"));
             task.xpMultipliers.push(getBindedTaskEffect("Unusual Insight"));
-        } else if (skillCategories["Dark magic"].includes(task.name)) {
-            task.xpMultipliers.push(getEvil)
+        }
+        if(jobCategories["Nobility"].includes(task.name)) {
+            //todo
         }
     }
 
@@ -802,7 +832,7 @@ function updateRequiredRows(data, categoryType) {
                         var task = gameData.taskData[requirement.task]
                         //why not just use the already-built requirement.isCompleted check?
                         if (task.level >= requirement.requirement) continue
-                        var text = " " + requirement.task + " level " + format(task.level) + "/" + format(requirement.requirement) + ","
+                        var text = " " + requirement.task + " level " + task.level + "/" + format(requirement.requirement) + ","
                         finalText += text
                     }
                     finalText = finalText.substring(0, finalText.length - 1)
@@ -877,26 +907,26 @@ function updateTaskRows() {
 
 function updateItemRows() {
     for (key in gameData.itemData) {
-        var item = gameData.itemData[key]
-        var row = document.getElementById("row " + item.name)
-        var button = row.getElementsByClassName("button")[0]
-        button.disabled = gameData.coins < item.getExpense()
-        var active = row.getElementsByClassName("active")[0]
-        var color = itemCategories["Properties"].includes(item.name) ? headerRowColors["Properties"] : headerRowColors["Misc"]
-        active.style.backgroundColor = gameData.currentMisc.includes(item) || item == gameData.currentProperty ? color : "white"
-        row.getElementsByClassName("effect")[0].textContent = item.getEffectDescription()
-        formatCoins(item.getExpense(), row.getElementsByClassName("expense")[0])
+        var item = gameData.itemData[key];
+        var row = document.getElementById("row " + item.name);
+        var button = row.getElementsByClassName("button")[0];
+        //button.disabled = gameData.coins < item.getExpense();
+        var active = row.getElementsByClassName("active")[0];
+        var color = itemCategories["Properties"].includes(item.name) ? headerRowColors["Properties"] : headerRowColors["Misc"];
+        active.style.backgroundColor = gameData.currentMisc.includes(item) || item == gameData.currentProperty ? color : "white";
+        row.getElementsByClassName("effect")[0].textContent = item.getEffectDescription();
+        formatCoins(item.getExpense(), row.getElementsByClassName("expense")[0]);
     }
 }
 
 function updateHeaderRows(categories) {
     for (categoryName in categories) {
-        var className = removeSpaces(categoryName)
-        var headerRow = document.getElementsByClassName(className)[0]
-        var maxLevelElement = headerRow.getElementsByClassName("maxLevel")[0]
-        gameData.rebirthOneCount > 0 ? maxLevelElement.classList.remove("hidden") : maxLevelElement.classList.add("hidden")
-        var skipSkillElement = headerRow.getElementsByClassName("skipSkill")[0]
-        skipSkillElement.style.display = categories == skillCategories && autoLearnElement.checked ? "block" : "none"
+        var className = removeSpaces(categoryName);
+        var headerRow = document.getElementsByClassName(className)[0];
+        var maxLevelElement = headerRow.getElementsByClassName("maxLevel")[0];
+        gameData.rebirthOneCount > 0 ? maxLevelElement.classList.remove("hidden") : maxLevelElement.classList.add("hidden");
+        var skipSkillElement = headerRow.getElementsByClassName("skipSkill")[0];
+        skipSkillElement.style.display = categories == skillCategories && autoLearnElement.checked ? "block" : "none";
     }
 }
 
@@ -920,6 +950,20 @@ function updateText() {
 
     document.getElementById("timeWarpingDisplay").textContent = "x" + getAllTimeMultipliers().toFixed(2);
     document.getElementById("timeWarpingButton").textContent = gameData.timeWarpingEnabled ? "Disable warp" : "Enable warp";
+
+    function updateBuildingBadges() {
+        var woodenHutButton = document.getElementById("woodenHut");
+        woodenHutButton.children[0].innerHTML = o_townBuildingsContainer.o_woodenHut.count;
+
+        var farmButton = document.getElementById("farm");
+        farmButton.children[0].innerHTML = o_townBuildingsContainer.o_farm.count;
+
+        var grainShedButton = document.getElementById("grainShed");
+        grainShedButton.children[0].innerHTML = o_townBuildingsContainer.o_grainShed.count;
+    }
+    updateBuildingBadges();
+
+    formatCoins(gameData.rawTownIncome, document.getElementById("townIncomeDisplay"));
 }
 
 function setSignDisplay() {
@@ -970,14 +1014,15 @@ function doCurrentTask(task) {
 }
 
 function getIncome() {
-    var income = 0
-    income += gameData.currentJob.getIncome()
-    return income
+    var income = 0;
+    income += gameData.currentJob.getIncome();
+    income += gameData.rawTownIncome;
+    return income;
 }
 
 function increaseCoins() {
-    var coins = applySpeed(getIncome())
-    gameData.coins += coins
+    var coins = applySpeed(getIncome());
+    gameData.coins += coins;
 }
 
 function daysToYears(days) {
@@ -1069,31 +1114,31 @@ function getKeyOfLowestValueFromDict(dict) {
     values.sort(function(a, b){return a - b})
 
     for (key in dict) {
-        var value = dict[key]
+        var value = dict[key];
         if (value == values[0]) {
-            return key
+            return key;
         }
     }
 }
 
 function autoLearn() {
-    if (!autoLearnElement.checked || !skillWithLowestMaxXp) return
-    gameData.currentSkill = skillWithLowestMaxXp
+    if (!autoLearnElement.checked || !skillWithLowestMaxXp) return;
+    gameData.currentSkill = skillWithLowestMaxXp;
 }
 
 function yearsToDays(years) {
-    var days = years * 365
-    return days
+    var days = years * 365;
+    return days;
 }
  
 function getDay() {
-    var day = Math.floor(gameData.days - daysToYears(gameData.days) * 365)
-    return day
+    var day = Math.floor(gameData.days - daysToYears(gameData.days) * 365);
+    return day;
 }
 
 function increaseDays() {
-    var increase = applySpeed(1)
-    gameData.days += increase
+    var increase = applySpeed(1);
+    gameData.days += increase;
 }
 
 function format(number) {
@@ -1115,6 +1160,13 @@ function format(number) {
     return scaled.toFixed(1) + suffix;
 }
 
+/*
+* Input:  coins   = 'number' type, representing money in raw copper coins format
+*         element = any HTML element containing four <span> elements. 
+* Output: Coin values are placed into their respective <span> elements. 
+*         Span styles are set to represent coin colors. (e.g. gold color for gold coins)
+*
+*/
 function formatCoins(coins, element) {
     var tiers = ["p", "g", "s"]
     var colors = {
@@ -1173,15 +1225,18 @@ function rebirthOne() {
 }
 
 function rebirthTwo() {
-    gameData.rebirthTwoCount += 1
-    gameData.evil += getEvilGain()
+    testSuccessOfTownDestruction();
+    gameData.rebirthTwoCount += 1;
+    gameData.evil += getEvilGain();
 
-    rebirthReset()
+    rebirthReset();
 
     for (taskName in gameData.taskData) {
-        var task = gameData.taskData[taskName]
-        task.maxLevel = 0
+        var task = gameData.taskData[taskName];
+        task.maxLevel = 0;
     }    
+    destroyTownWhileEmbracingEvil();
+    testSuccessOfTownDestruction();
 }
 
 function rebirthReset() {
@@ -1297,46 +1352,50 @@ function replaceSaveDict(dict, saveDict) {
 }
 
 function saveGameData() {
-    localStorage.setItem("gameDataSave", JSON.stringify(gameData))
+    saveTownState();
+    localStorage.setItem("gameDataSave", JSON.stringify(gameData));
 }
 
 function loadGameData() {
-    var gameDataSave = JSON.parse(localStorage.getItem("gameDataSave"))
+    var gameDataSave = JSON.parse(localStorage.getItem("gameDataSave"));
 
     if (gameDataSave !== null) {
-        replaceSaveDict(gameData, gameDataSave)
-        replaceSaveDict(gameData.requirements, gameDataSave.requirements)
-        replaceSaveDict(gameData.taskData, gameDataSave.taskData)
-        replaceSaveDict(gameData.itemData, gameDataSave.itemData)
+        replaceSaveDict(gameData, gameDataSave);
+        replaceSaveDict(gameData.requirements, gameDataSave.requirements);
+        replaceSaveDict(gameData.taskData, gameDataSave.taskData);
+        replaceSaveDict(gameData.itemData, gameDataSave.itemData);
+        //replaceSaveDict(gameData.townData, gameDataSave.townData);
 
-        gameData = gameDataSave
+        gameData = gameDataSave;
     }
 
-    assignMethods()
+    loadTownState();
+    gameData.rawTownIncome = updateRawTownIncome();
+    assignMethods();
 }
 
 function updateUI() {
-    updateTaskRows()
-    updateItemRows()
-    updateRequiredRows(gameData.taskData, jobCategories)
-    updateRequiredRows(gameData.taskData, skillCategories)
-    updateRequiredRows(gameData.itemData, itemCategories)
-    updateHeaderRows(jobCategories)
-    updateHeaderRows(skillCategories)
-    updateQuickTaskDisplay("job")
-    updateQuickTaskDisplay("skill")
-    hideEntities()
-    updateText()
+    updateTaskRows();
+    updateItemRows();
+    updateRequiredRows(gameData.taskData, jobCategories);
+    updateRequiredRows(gameData.taskData, skillCategories);
+    updateRequiredRows(gameData.itemData, itemCategories);
+    updateHeaderRows(jobCategories);
+    updateHeaderRows(skillCategories);
+    updateQuickTaskDisplay("job");
+    updateQuickTaskDisplay("skill");
+    hideEntities();
+    updateText();
 }
 
 function update() {
-    increaseDays()
-    autoPromote()
-    autoLearn()
-    doCurrentTask(gameData.currentJob)
-    doCurrentTask(gameData.currentSkill)
-    applyExpenses()
-    updateUI()
+    increaseDays();
+    autoPromote();
+    autoLearn();
+    doCurrentTask(gameData.currentJob);
+    doCurrentTask(gameData.currentSkill);
+    applyExpenses();
+    updateUI();
 }
 
 function resetGameData() {
@@ -1350,16 +1409,42 @@ function resetGameData() {
 }
 
 function importGameData() {
-    var importExportBox = document.getElementById("importExportBox")
-    var data = JSON.parse(window.atob(importExportBox.value))
-    gameData = data
-    saveGameData()
-    location.reload()
+    var importExportBox = document.getElementById("importExportBox");
+    var data = JSON.parse(window.atob(importExportBox.value));
+    gameData = data;
+    saveGameData();
+    location.reload();
 }
 
 function exportGameData() {
-    var importExportBox = document.getElementById("importExportBox")
-    importExportBox.value = window.btoa(JSON.stringify(gameData))
+    var importExportBox = document.getElementById("importExportBox");
+    importExportBox.value = window.btoa(JSON.stringify(gameData));
+}
+
+function registerEventListeners() {
+    let woodenHutButton = document.getElementById("woodenHut");
+    woodenHutButton.addEventListener("click", o_townBuildingsContainer.o_woodenHut.handleClick);
+    woodenHutButton.addEventListener("mouseenter", updateTooltip);
+
+    let farmButton = document.getElementById("farm");
+    farmButton.addEventListener("click", o_townBuildingsContainer.o_farm.handleClick);
+    farmButton.addEventListener("mouseenter", updateTooltip);
+
+    let grainShedButton = document.getElementById("grainShed");
+    grainShedButton.addEventListener("click", o_townBuildingsContainer.o_grainShed.handleClick);
+    grainShedButton.addEventListener("mouseenter", updateTooltip);
+}
+
+/*
+*   Note: this gets called before we register event listeners, otherwise we register
+*   the old functions with improper 'this' context.
+*/
+function bindObjectFunctionContexts() {
+    
+    o_townBuildingsContainer.o_woodenHut.handleClick = o_townBuildingsContainer.o_woodenHut.handleClick.bind(o_townBuildingsContainer.o_woodenHut);
+    o_townBuildingsContainer.o_farm.handleClick = o_townBuildingsContainer.o_farm.handleClick.bind(o_townBuildingsContainer.o_farm);
+    o_townBuildingsContainer.o_grainShed.handleClick = o_townBuildingsContainer.o_grainShed.handleClick.bind(o_townBuildingsContainer.o_grainShed);
+    o_townBuildingsContainer.o_grainShed.calculateMultiplier = o_townBuildingsContainer.o_grainShed.calculateMultiplier.bind(o_townBuildingsContainer.o_grainShed);
 }
 
 //Init
@@ -1505,6 +1590,7 @@ gameData.requirements = {
     "Cheap Fishing Rod": new TaskRequirement([getItemElement("Cheap Fishing Rod")], [{task: "Fisherman", requirement: 10}]),
     "Miner's Lantern": new TaskRequirement([getItemElement("Miner's Lantern")], [{task: "Miner", requirement: 10}]),
     "Crappy Anvil": new TaskRequirement([getItemElement("Crappy Anvil")], [{task: "Blacksmith", requirement: 10}]),
+    "Breech Bellows": new TaskRequirement([getItemElement("Breech Bellows")], [{task: "Blacksmith", requirement: 25}]),
     "Pack Horse": new TaskRequirement([getItemElement("Pack Horse")], [{task: "Merchant", requirement: 10}]),
     "Small Shop": new TaskRequirement([getItemElement("Small Shop")], [{task: "Merchant", requirement: 75}]),
     "Weapon Outlet": new TaskRequirement([getItemElement("Weapon Outlet")], [{task: "Merchant", requirement: 200}]),
@@ -1512,20 +1598,21 @@ gameData.requirements = {
     "Livestock-derived Fertilizer": new TaskRequirement([getItemElement("Livestock-derived Fertilizer")], [{task: "Farmer", requirement: 85}]),
 }
 
-tempData["requirements"] = {}
+tempData["requirements"] = {};
 for (key in gameData.requirements) {
-    var requirement = gameData.requirements[key]
-    tempData["requirements"][key] = requirement
+    var requirement = gameData.requirements[key];
+    tempData["requirements"][key] = requirement;
 }
 
-loadGameData()
+loadGameData();
+bindObjectFunctionContexts();
+registerEventListeners();
+setCustomEffects();
+addMultipliers();
 
-setCustomEffects()
-addMultipliers()
+setTab(jobTabButton, "jobs");
 
-setTab(jobTabButton, "jobs")
-
-update()
-setInterval(update, 1000 / updateSpeed)
-setInterval(saveGameData, 3000)
-setInterval(setSkillWithLowestMaxXp, 1000)
+update();
+setInterval(update, 1000 / updateSpeed);
+setInterval(saveGameData, 3000);
+setInterval(setSkillWithLowestMaxXp, 1000);

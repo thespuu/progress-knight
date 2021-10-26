@@ -1,10 +1,279 @@
-# progress-knight
+## progress-knight
 An incremental game developed by ihtasham42 and extended by Cameron Gott. https://camerongott.github.io/progress-knight/
+With assistance from:
+nathiral
+theSpuu
 
-
-Link to the original game: https://ihtasham42.github.io/progress-knight/
+Link to the base game: https://ihtasham42.github.io/progress-knight/
 
 # dev-diary  
+
+### 10/17/2021  
+Goal for today:  squash that Shop bug!  
+
+What's that shop bug? Someone in Discord said there's a known (to them) bug where if you have a shop item active,  
+there's a case where you cannot deactivate that item if you're too poor.  
+
+So where tf is the code that handles shop button clicks?  
+  
+Found it in updateItemRows(). Upon inspection, found the suspect line of code.  
+And honestly, looks like an innocent logic error. Commenting out the line gives us the desired behavior  
+of full control over item purchasing once initially unlocked.  
+
+### 10/15/2021  
+# Updates! October 3rd - October 15th, 2021  
+-restyled tooltips for easier readability, reduced eye strain  
+-dynamic tooltips for Town buildings  
+-first-pass rebalancing of Grain Shed's exponential income growth. Now nerfed to a more reasonable level.  
+  
+### 10/15/2021
+Digging into the "building count stuck at 0" bug.  
+    -what is the evaluated typoeof count? Evaluated as type: number. Ok.  
+    -verify increment within handleClick() is functioning as expected (this should be unit test lol)  
+        -townContainer object is indeed getting the correct increments.
+
+Conclusion: I was resetting the saved and working counts to 0, and then logging the values to check them. Oops.   
+            Of course they're going to display as 0.  
+-"bug" squashed. 
+-wrapped log writes to only occur following the enableDebugging toggle variable
+
+### 10/14/2021
+-wrap Wooden Hut prototype tooltip cost in a dedicated span with ID format: coins-{buildingID} example: coins-woodenHut  
+-updateTooltip(): search child elements of tooltip element to locate the new coin span - wanted to use childNode type function but was nudged back towards  
+    element.querySelector by StackOverflow. I blame future performance issues on them (lol jk)  
+-use built-in formatCoins function to display inner span coin value by formatCoins(newBuildingCost, coinSpan)  
+-rework dedicated coin span to contain 4 empty span elements, as required by formatCoins function  
+  
+Prototype dynamic tooltip complete!  
+Testing...  
+Testing reveals updateTooltip is only getting called once. Which means I did a dumb.  
+  
+Cause: when adding the event listener for mouseenter, I invoked the updateTooltip function instead of passing the function object.  
+Solution: Re-organize updateTooltip parameter to be the event object, grab the button ID from the event object attribute 'currentTarget'  
+  
+Step 1: rewrite updateTooltip signature to accept event parameter  
+Step 2: inside updateTooltip, first use event attribute currentTarget.id to determine the base of the tooltip ID  
+    (using same variable name for tooltip to reuse existing function code)  
+Step 3: update addEventListener to reflect changes.  
+  
+Sparkle: this rework has the added benefit of making the updateTooltip work for all Town buttons.  
+  
+Note: currentTarget always refers to the HTML element that the event listener was attached to, per Mozilla docs. Use this to grab the base ID.  
+  
+Success!  
+  
+Next: I want the tooltip to update when a user buys a building. Currently, the tooltip doesn't update until the user's  
+mouse leaves and then reenters the div.  
+  
+Solution: add a call to updateTooltip() at the end of the click handler function.  
+Expected: tooltip will update automatically after a building purchase.  
+  
+Step 1: add eventObject parameter to handleClick function inside woodenHut object.  
+Step 2: confirm the eventObject.currentTarget is the woodenHut building HTML button element  
+Step 3: simply pass the eventObject as a parameter to the updateTooltip call at the bottom of handleClick  
+    Note: the event objects are of different types, but the currentTarget will hopefully be unchanged.  
+
+SUCCESS! LET'S GOOOO!  
+  
+Lastly, port the changes to woodenHut to the other town buildings.  
+-[x] Farm  
+-[x] Grain Shed  
+Oops, forgot I hard-coded the building cost to check wooden hut.  
+In building object, add an attribute for id (to aid in using the button id when looking up the corresponding building object).  
+  
+I love the fact that I can look up object properties using array-like syntax with the index / key being a template string.  
+Fuck yeah. I just leveled up.  
+  
+Implement town destruction when embracing Evil.  
+-add attribute: baseCost to townBuilding objects (this value will never be modified)  
+-reset object values to their bases in o_townBuildingContainer  
+-reset object values to their bases in gameData.townData, if present  
+  
+[x] Future TODO: decouple the base definitions in townBuildings.js from the current working set of town data
+Bug: Town building counts aren't getting saved, but costOfNextBuilding is getting saved.
+
+### 10/11/2021
+
+Updated tooltip style for better visual separation and ease of reading.  
+Wrote tooltips for town buildings.  
+Began work on dynamic tooltip updates.  
+
+### 10/5/2021  
+
+Preparation for dynamic tootip generation.  
+
+[x] - static tooltip for Wooden Hut
+
+Added prototype tooltip to Wooden Hut button. Tooltip displays as intended, but the button
+positioning gets thrown off. I suspect the CSS of the div that wraps the hut button is interfering with 
+the formatting, so the next step is to lazily play with div positioning and see if there is an easy fix.
+
+Wrapping the whole row of buttons fixes the button display issues, but results in undesired tooltip behavior.
+
+Try targetting .tooltip class within the button CSS rules to apply the styles in the nested div. Maybe the CSS
+isn't applied when the div wraps the button. 
+
+I feel like w3-row is interfering with tooltip text display. 
+
+Nah, ruled out w3-row as the culprit. I next tried removing all button classes except for tooltip.
+And whaddya know, the tooltip appears. So one of the button classes is interfering somehow.
+Lets re-add all the classes, then remove 'em one by one.
+
+w3-button is confirmed to be the culprit. 
+
+Fix: replace w3-button class with "button item-button" classes. Buttons look about the same and support
+desired tooltip behavior.
+
+### 10/4/2021  
+
+Began preliminary work on dynamic tooltip generation for Town building buttons.
+Reviewed codebase.
+
+### 10/3/2021
+Whew, long time no see!  
+
+The last two months have seen a lot of life progress, but very little
+Progress Knight progress (see what I did there). I've settled in to my first post-college job as a software engineer, jumped back into my pre-Covid physical training, and just generally got my shit back together. Now it's time to forge ahead!  
+
+But enough about me, let's get to work on Progress Knight! 
+
+It's always an interesting feeling coming back to an old project. Much of it feels familiar, but every code location
+and variable name feels a little fuzzy. It takes longer to remember what a function does, and why it exists. Remembering where to find a certain code snippet takes more conscious effort. The frame of thought has been morphed, as we all morph throughout this journey called life. The closest relatable feeling I can compare it to is returning to an old sport.  
+  
+One part of you knows exactly how to kick the ball, swing the bat, or move your body just so. But your body just doesn't obey. Your mind is calibrated to your old sharp reflexes, your old expectations. But for the first couple of weeks, your body doesn't seem capable of following instructions. Oh, it will do what you tell it to do, but not exactly how you intend it. Maybe there's a shake in your arms, a dip in your wrists at just the wrong moment, a little twitch that throws off your game.  
+
+So with that said, my intent for the next two weeks is to simply get back in the groove of Progress Knight.  
+What does that look like?  
+
+Re-reading the entire code base.  
+Re-reading my dev diary.  
+Making notes as I go through the code.  
+Answering old questions I never sought clarity on (tooltip architecture, implementing event-based architecture, etc).   
+
+
+
+### 9/7/2021
+After a long job search and new-job chaos, the development hiatus is slowly ending.
+Merged WIP Town features with v0.3, pushed to live branch.
+Added a blacksmith item.
+
+### 8/4/2021  
+Today I'd like to save and load building progress. I'll add a simple state-tracking object  
+to gameData that tracks each building's count and cost of next purchase. Then when the game calls  
+the existing saveGameData function, this object will be included. To load building progress, I'll add a function  
+to the loadGameData function that iterates through the saveData building object and sets the values in o_townBuildingsContainer  
+to the saved values. This should work in theory. townBuildings.js is loaded into the page before main.js, so the building container  
+is available to be written into. 
+
+- [x] add state-tracking object to gameData (townData)   
+- [x] add function to saveGameData that writes key-value pairs into townData object  
+- [x] call save function within saveGameData and confirm state is saved to localStorage  
+- [x] write loadTownState() function to set o_container building properties to their saved data equivalents  
+- [x] call loadTownState() in loadGameData after gameData has been replaced with gameDataSave  
+
+Save functionality is complete.  
+TODO: dynamic tooltips for town building buttons  
+### 8/3/2021  
+  
+Plan for the day:  
+ 1. Finish hooking up Farm xp and income bonuses. Income will fit into one of the existing income calculation  
+ functions. XP will be a little trickier. Normally for a new skill or item, I'd  simply add an entry or two into  
+ addMultipliers(). The problem with using that approach for Town buildings is that addMultipliers is a setup function  
+ in that it only gets called one time, before the main game loop begins. If I used addMultipliers(), you'd only ever update  
+ your Town bonuses every time you refreshed the page! But what we actually expect to happen is every time we buy a new building with  
+ our hard earned cash we get some nice rewards immediately.  
+   
+ Solution: handle income and xp bonuses within each building's handleClick function. Use the global gameData object to store ~~a subset of  
+ the town's state that we need for calculating bonuses and progress~~ town building object references. A nested object within gameData can  
+ store ~~the name and count of each building~~ references to our building objects. Because we've been using gameData for most  
+ everything, this will allow intuitive access and will take advantage of the already-built save mechanisms that are based off of the gameData object.  
+
+ Code required:  
+ - [x] wrap town building objects in containing object  
+ - [x] refactor existing town object calls to reflect new access pattern using container object  
+ - [x] gameData subobject to store building references  
+ - [x] gameData field to store current income from town buildings (so we don't have to constantly recalculate unchanging values)  
+ - [x] global function within townBuildings.js to calculate and return the amount of income from entire town  
+ - [x] code to link income calculation to the main.js income calculation that applies gameSpeed to our income  
+ - [x] code inside handleClick functions to update town income  
+ - [ ] code inside handleClick functions to update or add xp multipliers (this needs to be broken down into smaller chunks)
+ - [x] code to display town income per day in the Town tab
+
+ Debug:  
+ Running into an issue with the new gameData references. I'm wondering if when I set gameData.townData = o_townBuildingsContainer if Javascript makes  
+ a copy of the object rather than a reference to the existing object in townBuildings.js. According to some posts on Stack Overflow, I should indeed have a  
+ reference, not a copy. I'll revert to using the o_container for now until I can get some in-depth reading done on the subject.  
+
+ gameData references reverted back to o_townBuildingsContainer refs.  
+ Testing of updateRawTownIncome() function successfully completed.  
+ Function getIncome() is responsible for adding up all raw income values from jobs and now buildings.  
+ getIncome() is then called within increaseCoins() as:  
+
+```
+var coins = applySpeed(getIncome());
+gameData.coins += coins;
+
+```
+
+TODO:  
+-save town state between rebirths and page refreshes  
+ 
+### 8/2/2021  
+-wrote object prototype for town building data  
+-include town building definitions file in index.html script loading section  
+-wrote the setup function registerEventListeners  
+-wrote the setup functin for binding object contexts  
+-wrote the handleClick function for wooden huts  
+-wrote updateText() sub-function updateBuildingBadges() to update badges for building counts  
+-built the Farm object  
+
+TODO
+-write a function to push new xp multiplier to a nobility task on object purchase
+
+Notes: calling a Function object's bind() method returns a new Function with the indicated context of this. I was having issues  
+with function binding because I was failing to set the buliding object's function to the returned function. 
+
+***** Recipe: adding a building *****  
+-Step one: add object definition to townBuildings.js
+-Step two: write the HTML in the Town tab
+-Step three: add code to updateText() -> updateBuildingBadges()  
+-Step four: registerEventListeners()  
+-Step five: bindObjectFunctionContexts()  
+-Step six: addMultipliers(), or other custom behavior implementation  
+
+### 7/29/2021  
+-prototype town button layout with inner badge to track building count  
+-wrap town building buttons in responsive container to allow graceful reorganization for these wild mobile and 
+    tablet players  
+-wrap page layout in W3 Responsive class at some point because fixed pixel widths are so 2005 xD  
+
+Rearchitecting my ideas around Town features. I have a little bit more experience and wisdom now.
+I want to have a separation of Town state and Town behavior / control. So that means building definitions in this rework  
+will no longer track any state properties like number-purchased, only things like base cost and base population per building.  
+Then I'll build a separate town controller function / set of functions that get called on updates to make decisions and update town state.  
+
+I'm debating whether or not the separation of money between personal and town accounts is a fun mechanic. It seems fun at first, but could easily become  
+one more boring thing to micromanage across rebirths and actions. So I think if I do like this mechanic enough to keep it, it'll be essential to have some buttons or toggles  
+to enable automatic management policies like "Always invest enough to prevent bankruptcy" or "Match town expenses" to prevent town bankruptcy and death / decay. I don't know.  
+One huge downside of linking the finances of both is that I'd have to account for balance. Right now the player makes so much money as a Chairman that it's relatively easy to  
+just throw money at a town. Some of this can be negated by the organic nature of a town's growth, but still. Would be quite the challenge to balance in a way that feels sane  
+to the player and is still fun for all levels of progression. 
+
+Part of me thinks it will be fun to build independent town behavior. AKA, you the player gets to make broad decisions but certain town factors like population, wealth, health,  
+satisfaction, etc are somewhat randomized and dynamic. Players can guide and influence their towns, but towns are their own organic system just like in real life. This would also  
+provide an intuitive upgrade mechanism where higher Nobility ranks grant increased control of a towns state through various skills and abilities and governing policies.  
+
+### 7/27/2021  
+
+#### Changelog:  
+-add Projects button to main navigation bar  
+-Placeholder Project tab content for testing purposes  
+-Create first-iteration project base data and project category objects  
+-Fixed a logic bug inside of the addMultipliers() function. If the current task was equal to Chairman, the general Magic bonuses were getting  
+    skipped due to the if - elseif - elseif structure. Fixed this by pulling out the magic bonuses into an if-statement at the end of the code block.  
+    Of course, all of the Chairman skills were balanced with this buggy progression in mind. Some playtesting is in order to rebalance anything, if necessary.  
+    Alternatively, I did intend for those skills to make Chairman reachable, so it would make perfect sense to leave the faster progress in place and just make more content.  
+ 
 7/12/2021  
 It's time to move the story forward. It's time to learn how to be a Chairman so skilled, so wise, that that Chairman is worthy of level 1000.  
 
@@ -286,3 +555,4 @@ Using Chrome's Devtools, I see that the span containing the progress bars (quick
 Oh weird. So I went to ihtasham42's github.io version, and the quick dislay is indeed intended to be hidden. Literally never noticed this behavior before.
 Not sure how I feel about this. May modify in later versions to display immediately, as it's pretty convenient. Design-wise, idle games always benefit from
 visible progress bars on startup. (this may be a rare opinion. Who knows.)
+>>>>>>> v0.3

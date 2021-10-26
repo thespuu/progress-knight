@@ -75,17 +75,23 @@ button:focus {
 }
   
 .tooltip .tooltipText {
-    visibility: hidden;
-    width: 240px;
+    visibility: hidden; 
+    width: 20vw;
     background-color: black;
     color: #fff;
     text-align: center;
+
+    border-style: solid;
+    border-width: 3px;
+    border-color: rgb(92, 92, 247);
     border-radius: 6px;
-    padding: 10px 0;
+
+    padding: 15px 15px;
+    
 
     /* Position the tooltip */
     position: absolute;
-    z-index: 1;
+    z-index: 100;
     top: -5px;
     left: 105%;
 
@@ -95,7 +101,7 @@ button:focus {
   
 .tooltip:hover .tooltipText {
     visibility: visible;
-    opacity: 0.8;
+    opacity: 0.9;
 }
 
 .sidebar-element {
@@ -150,4 +156,8 @@ button:focus {
 
 .small-margin  {
     margin-bottom: 2px;
+}
+
+#navpanel {
+    position: fixed;
 }

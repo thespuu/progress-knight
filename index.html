@@ -23,7 +23,7 @@
         <div style="width: 1220px; height: 600px">
 
             <!--******* Left-hand summary panel *******-->
-            <div class="panel w3-padding" style="width: 300px; height: auto; float: left">
+            <div id="navpanel" class="panel w3-padding" style="width: 300px; height: auto; float: left">
                 <span id="deathText">
                     <div style="font-size: large; color: red">Age has caught up to you</div>
                     <div class="sidebar-element" style="color: gray">Your age has met your lifespan, use the amulet to rebirth before you pass away</div>
@@ -117,15 +117,16 @@
             </div> <!-- End left-hand summary panel -->
             
             <!--******* Nav-bar with tabbed content navigation buttons *******-->
-            <div class="panel w3-margin-left" style="width: 900px; height: 40px; float: left">
+            <div class="panel w3-margin-left" style="width: 900px; height: 40px; float: right">
                 <div class="w3-button w3-bar-item tabButton" id="jobTabButton" onClick="setTab(this, 'jobs')">Jobs</div>
                 <div class="w3-button w3-bar-item tabButton" onClick="setTab(this, 'skills')">Skills</div>
                 <div class="w3-button w3-bar-item tabButton" id="shopTabButton" onClick="setTab(this, 'shop')">Shop</div>
+                <div class="w3-button w3-bar-item tabButton" id="townTabButton" onClick="setTab(this, 'town')">Town</div>
                 <div class="w3-button w3-bar-item tabButton" id="rebirthTabButton" onClick="setTab(this, 'rebirth')">Amulet</div>
                 <div class="w3-button w3-bar-item tabButton" onClick="setTab(this, 'settings')" style="float: right">Settings</div>
             </div> <!-- End nav-bar -->
 
-            <div class="panel w3-margin-left w3-margin-top w3-padding" style="width: 900px; height: auto; float: left">
+            <div class="panel w3-margin-left w3-margin-top w3-padding" style="width: 900px; height: auto; float: right">
                 <template class="headerRowTaskTemplate">
                     <tr>
                         <th class="category" style="width: 250px">Job</th>
@@ -216,6 +217,7 @@
                     </td> 
                 </template>
 
+                <!--********************************* Tab Definitions ************************************-->
                 <div class="tab" id="jobs">
                     <table id="jobTable" class="w3-table w3-bordered">
                     </table>
@@ -229,6 +231,81 @@
                 <div class="tab" id="shop">
                     <table id="itemTable" class="w3-table w3-bordered">
                     </table>
+                </div>
+
+                <div class="tab" id="town">
+                    <h4>Town</h4>
+                    <p>Your heroic feats in battle have earned you a title of nobility and a huge swath of some rather...undesirable land. 
+                        Your territory is hundreds of miles from the nearest village, the soil is infertile, and the few living beings around are bandits and hermits. It's going to 
+                        take a lot of work to make this place worth anything.
+                    </p>
+                    <p style="display: inline-block;">Town Income per day: </p>
+                    <div style="font-size: large; display: inline-block;" id="townIncomeDisplay">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <hr>
+                    <h5>Basic Buildings</h5>
+                    <div class="w3-row">
+                        
+                        <button type="button" id="woodenHut" class="tooltip button item-button w3-black w3-round-large w3-border w3-border-grey w3-quarter w3-margin-right w3-margin-bottom">
+                            Wooden Hut<span class="w3-badge w3-margin-left w3-white">0</span>
+
+                            <span id="tooltip-woodenHut" class="tooltipText">Wooden Hut <hr><br> A humble dwelling that provides the basic requirements of nature. 
+                            Rough wooden logs join together in support of brown thatched roofing, providing a cozy retreat from rain and wind. <br>
+                            Your people won't become spoiled while living in huts such as these; they'll be one with nature. <br><br>
+                            Cost: <span id="coins-woodenHut">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                            </span> <br>
+                            Cost growth: 1.0% <br>
+                            Effect: None</span>
+                        </button>
+                                
+                        <button type="button" id="farm" class="tooltip button item-button w3-black w3-round-large w3-border w3-border-grey w3-quarter w3-margin-right w3-margin-bottom">
+                            Farm <span class="w3-badge w3-margin-left w3-white">0</span>
+
+                            <span id="tooltip-farm" class="tooltipText">Farm <hr><br>
+                            Rocks abound within these sour patches of inhospitable soil you and your people call "farms". <br>
+                            Healing the soil is a monumental undertaking. It will doubtless take generations of care. Or some nifty magic...<br><br>
+                        
+                            Cost: <span id="coins-farm">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </span> <br>
+                            Cost growth: 5.0% <br>
+                            Effect: Additional daily income: 150 coppers <br></span>
+                        </button>
+
+                        <button type="button" id="grainShed" class="tooltip button item-button w3-black w3-round-large w3-border w3-border-grey w3-quarter w3-margin-right w3-margin-bottom">
+                            Grain Shed<span class="w3-badge w3-margin-left w3-white">0</span>
+
+                            <span id="tooltip-grainShed" class="tooltipText">Grain Shed <hr><br>
+                            A savy merchant knows the dynamics of supply and demand. Besides the obvious fact that storing your grain delays that pesky nuisance of winter starvation,
+                            your grain sheds allow your townsfolk to hold off selling their grain until prices rise. The more grain storage your town builds, the more influence on prices
+                            your town wields. <br><br>
+                            Cost: <span id="coins-grainShed">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                            </span> <br>
+                            Cost growth: 1.0%  <br>
+                            Effect: Additional 6% Farm income (compounding) <br><br>
+                        
+                            Note: Your town's abuse of the grain markets has been noted. Expect the kingdon to limit your egregious profits soon.<br></span>
+                        </button>
+                        <button type="button" class="tooltip button item-button w3-black w3-round-large w3-border w3-border-grey w3-quarter w3-margin-right w3-margin-bottom">
+                            Secret <span class="w3-badge w3-margin-left w3-white">0</span>
+                            <span class="tooltipText">Soon!</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="tab" id="rebirth">
@@ -266,7 +343,8 @@
                                 A mouth emerges from its surface and begins to cackle, and proceeds to say: "So you've made it this far... Are you ready to embrace evil?"
                             </div>
                             <i style="color: rgb(200, 0, 0)">
-                                If you decide to embrace evil, all of your levels, coins and even max levels will be reset.
+                                If you decide to embrace evil, there is a price. All of your levels, coins and even max levels will be reset.
+                                Your town will be utterly annihilated; your townspeople slaughtered by your own hand.
                                 You will be reborn as a fresh slate. However, you will unlock a new line of skills and gain
                                 <b><span id="evilGainDisplay"></span> evil</b>, which will heavily impact your future lives.
                             </i>
@@ -310,6 +388,10 @@
 
 <script type="text/javascript" src="js/HackTimer.js"></script>
 <script type="text/javascript" src="js/classes.js"></script>
+<script type="text/javascript" src="js/townBuildings.js"></script>
+<script type="text/javascript" src="js/townFunctions.js"></script>
+<script type="text/javascript" src="js/updateTooltip.js"></script>
+
 <script type="text/javascript" src="js/main.js"></script>
 
 </html>

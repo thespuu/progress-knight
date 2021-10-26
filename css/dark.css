@@ -1,3 +1,6 @@
+.body {
+    color: red;
+}
 .dark {
     background-color: rgb(32, 32, 32);
     color: white
@@ -25,3 +28,4 @@
 .item-button {
     height: auto;
 }
+
