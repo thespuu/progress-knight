@@ -73,7 +73,10 @@ const jobBaseData = {
     "Sophomore": {name: "Sophomore", maxXp: 4000000, income: 500}, 
     "Junior": {name: "Junior", maxXp: 16000000, income: 1000}, 
     "Senior": {name: "Senior", maxXp: 64000000, income: 2000}, 
-    "Probation": {name: "Probation", maxXp: 300000000, income: 12000},
+    "Research Candidate": {name: "Research Candidate", maxXp: 300000000, income: 12000},
+    "Researcher": {name: "Researcher", maxXp: 640000000, income: 25000},
+    "Lead Researcher": {name: "Lead Researcher", maxXp: 2400000000, income: 35000},
+    "Head of Innovation": {name: "Head of Innovation", maxXp: 40000000000, income: 100000},
 
     "Baronet": {name: "Baronet", maxXp: 7500000, income: 3500},
     "Baron": {name: "Baron", maxXp: 40000000, income: 4500},
@@ -92,7 +95,7 @@ const jobBaseData = {
 
 const skillBaseData = {
     //original effect: 0.01
-    //Fundamentals
+    //Common Sense
     "Concentration": {name: "Concentration", maxXp: 100, effect: baseEffect, description: "Skill xp"},
     "Productivity": {name: "Productivity", maxXp: 100, effect: 0.01, description: "Job xp"},
     "Bargaining": {name: "Bargaining", maxXp: 100, effect: -0.01, description: "Expenses"},
@@ -104,7 +107,7 @@ const skillBaseData = {
     "Muscle memory": {name: "Muscle memory", maxXp: 100, effect: 0.01, description: "Strength xp"},
     
     //Magic
-    "Mana control": {name: "Mana control", maxXp: 100, effect: baseEffect, description: "T.A.A. xp"},
+    "Mana control": {name: "Mana control", maxXp: 100, effect: baseEffect, description: "Arcane Academy xp"},
     "Immortality": {name: "Immortality", maxXp: 100, effect: 0.01, description: "Longer lifespan"},
     "Time warping": {name: "Time warping", maxXp: 100, effect: 0.01, description: "Gamespeed"},
     "Super immortality": {name: "Super immortality", maxXp: 100, effect: 0.01, description: "Longer lifespan"},
@@ -166,7 +169,7 @@ const jobCategories = {
     "Common work"            :    ["Beggar", "Farmer", "Fisherman", "Miner", "Blacksmith", "Merchant"],
     "Military"               :    ["Squire", "Footman", "Veteran footman", "Knight", "Veteran knight", "Elite knight", "Holy knight", "Legendary knight"],
     "The Arcane Association" :    ["Student", "Apprentice mage", "Mage", "Wizard", "Master wizard", "Chairman", "Illustrious Chairman"],
-    "The Order of Discovery" :    ["Junior Caretaker", "Lead Caretaker", "Freshman", "Sophomore", "Junior", "Senior", "Probation"],
+    "The Order of Discovery" :    ["Junior Caretaker", "Lead Caretaker", "Freshman", "Sophomore", "Junior", "Senior", "Research Candidate", "Researcher", "Lead Researcher", "Head of Innovation"],
     "Nobility"               :    ["Baronet", "Baron", "Vice Count", "Count", "Duke", "Grand Duke", "Arch Duke", "Lord", "High Lord", "King", "High King", "Emperor of Mankind"]
 }
 
@@ -202,6 +205,7 @@ const headerRowColors = {
 }
 
 const tooltips = {
+    //The Daily Grind
     "Beggar": "Struggle day and night for a couple of copper coins. It feels like you are at the brink of death each day.",
     "Farmer": "Plow the fields and grow the crops. It's not much but it's honest work.",
     "Fisherman": "Reel in various fish and sell them for a handful of coins. A relaxing but still a poor paying job.",
@@ -209,6 +213,7 @@ const tooltips = {
     "Blacksmith": "Smelt ores and carefully forge weapons for the military. A respectable and OK paying commoner job.",
     "Merchant": "Travel from town to town, bartering fine goods. The job pays decently well and is a lot less manually-intensive.",
 
+    //The Miliary
     "Squire": "Carry around your knight's shield and sword along the battlefield. Very meager pay but the work experience is quite valuable.",
     "Footman": "Put down your life to battle with enemy soldiers. A courageous, respectable job but you are still worthless in the grand scheme of things.",
     "Veteran footman": "More experienced and useful than the average footman, take out the enemy forces in battle with your might. The pay is not that bad.",
@@ -218,6 +223,7 @@ const tooltips = {
     "Holy knight": "Collapse entire armies in mere seconds with your magically imbued blade. The handful of elite knights who attain this level of power are showered with coins.",
     "Legendary knight": "Feared worldwide, obliterate entire nations in a blink of an eye. Roughly every century, only one holy knight is worthy of receiving such an esteemed title.",
 
+    //The Arcane Academy
     "Student": "Study the theory of mana and practice basic spells. There is minor pay to cover living costs, however, this is a necessary stage in becoming a mage.",
     "Apprentice mage": "Under the supervision of a mage, perform basic spells against enemies in battle. Generous pay will be provided to cover living costs.",
     "Mage": "Turn the tides of battle through casting intermediate spells and mentor other apprentices. The pay for this particular job is extremely high.",
@@ -228,32 +234,37 @@ const tooltips = {
 
     //The Order of Discovery
     "Junior Caretaker": "A low-level administrator of the ancient Order of Discovery has offered you a job. Cleaning shit-stained chamber pots and mopping kitchen floors isn't glamorous work, but it gives you the rare chance to peruse the Order's world-class library of exotic books. Who cares if touching the books is an offense worthy of expulsion?",
-    "Lead Caretaker": "Witty placeholder, my name is.",
-    "Freshman": "I tip the tools, and inform the fools.",
-    "Sophomore": "Rhyming is crime-ing, and feature delay is not the way.",
-    "Junior": "Try as I do, these temporary tooltips are poo.",
-    "Senior": "Forget me not, for this author shall not.",
-    "Probation": "A tooltip a day, keeps the passionate fan at bay.",
+    "Lead Caretaker": "Being a Lead Caretaker for the Order of Discovery is a challenging but rewarding position. As a Lead Caretaker, you would be responsible for overseeing the work of the junior caretakers and ensuring that all the exhibits and artifacts in the Order's collection are properly cared for and preserved. This would involve coordinating cleaning and maintenance tasks, as well as monitoring the condition of the artifacts.",
+    "Freshman": "As a Freshman at the Order of Discovery, you would be responsible for studying ancient knowledge and artifacts. This would involve researching and analyzing the Order's collection, as well as participating in expeditions and fieldwork to discover new artifacts and information.",
+    "Sophomore": "As a Sophomore at the Order of Discovery, you would continue to study ancient knowledge and artifacts, but with a more specialized focus. You would be conducting more in-depth research on specific topics, and may be given the opportunity to lead smaller research projects.",
+    "Junior": "A day in the life of a Junior at the Order of Discovery would involve a combination of research, fieldwork, and administrative tasks that have been assigned to you by senior researchers.",
+    "Senior": "As a Senior at the Order of Discovery, before becoming a research candidate, you would have a high level of responsibility and expertise in your field. You would be leading complex research projects, often with the goal of making significant contributions to the understanding of ancient knowledge and artifacts.",
+    "Research Candidate": "As a Research Candidate at the Order of Discovery, once your new topic has been approved, you would be responsible for conducting in-depth research to confirm your hypothesis. This would involve designing and conducting research studies, collecting and analyzing data, and interpreting the results.",
+    "Researcher": "As a full-time researcher at the Order of Discovery, your main responsibility would be to continue conducting research on your chosen topic, with the goal of making significant contributions to the understanding of ancient knowledge and artifacts.",
+    "Lead Researcher": "As a Lead Researcher at the Order of Discovery, you would be responsible for overseeing the research efforts of the other researchers, and for experimenting with incorporating new research and findings into new processes or designs. This would involve staying up-to-date with the latest developments in your field, identifying new research opportunities, and leading research projects that explore new or innovative ideas.",
+    "Head of Innovation": "The Head of Innovation is the highest-ranking position within the Order of Discovery, responsible for leading the organization's research efforts and using new research and technology to directly advance the goals and agenda of the Order.",
 
     //Nobility
-    "Baronet": "A tooltip, a thought. Helpful, I am not.",
-    "Baron": "The finest $3 pizza modern food science can conceive",
-    "Vice Count": "Because Viscount sounds gross.",
-    "Count": "Are these placeholder tooltips infuriating?",
-    "Duke": "Good.",
-    "Grand Duke": "The nobility cares not for your tooltip desires. ",
+    "Baronet": "A Baronet is a junior member of the aristocracy, holding a hereditary title that is ranked below a baron and above a knight. However, unlike other titles in the aristocracy, the title of Baronet can be purchased, leading many to see it as an easy title to achieve, and thus it is somewhat looked down upon.",
+    "Baron": "Barons are typically wealthy landowners and have a significant amount of influence and prestige in society. They are often involved in politics and hold positions of power within the government, such as advisors to the king or members of the ruling council.",
+    "Vice Count": "A Vice Count is a high-ranking member of the nobility, holding a hereditary title that is ranked above a Baron and below a Count. Vice Count are typically wealthy landowners and have a significant amount of influence and prestige in society. ",
+    "Count": "A Count is a high-ranking member of the nobility, holding a hereditary title that is ranked above a Viscount and below a Duke. Counts are typically wealthy landowners and have a significant amount of influence and prestige in society. ",
+    "Duke": "A Duke would have a large estate, with a castle or manor house, and many retainers, such as stewards, bailiffs, and guards. They would also have a significant amount of wealth, which they would use to maintain their lifestyle and to support their political ambitions.",
+    "Grand Duke": "Grand Duke and Arch Duke are both high-ranking noble titles that are above a Duke. The exact ranking and responsibilities of a Grand Duke and Arch Duke may vary depending on the specific political system and traditions of that corner of the land, but in general, they are considered to be among the most powerful and influential members of the nobility without being members of the royal family.",
     "Arch Duke": "Even grander than the most grand Grand Duke your granddad could....Grand.",
-    "Lord": "Oh lord, please let Gottmilk write the real tooltips already. These are too painful to endure.",
-    "High Lord": "Is it April 20th?",
-    "King": "Now to find yourself a nice Queen. Or two. Or three.",
-    "High King": "Even higher. Even nobler.",
-    "Emperor of Mankind": "Go outside.",
+    "Lord": "A Lord is a member of the royal family and holds a high-ranking noble title. They would have a significant amount of influence and prestige in society and would be expected to conduct themselves with honor and dignity, upholding the traditions and values of the royal family.",
+    "High Lord": "A High Lord is a title that denotes a person of high nobility, or a person who holds a high-ranking position within a government or organization. The specific responsibilities and duties of a High Lord may vary depending on the context in which the title is used, but in general, they would hold a position of great authority and power.",
+    "King": "The King is the ruler of the kingdom, and holds the highest position of authority and power within the government and society. As king, they would have the final say in all matters of state, and would be responsible for making important decisions that affect the kingdom and its people.",
+    "High King": "The High King is the ruler of multiple kingdoms and holds the highest position of authority and power in the entire realm. The High King is responsible for making important decisions that affect the entire realm, and would have the final say in all matters of state.",
+    "Emperor of Mankind": "The Immortal Emperor of Mankind is a powerful and legendary figure, who holds the highest position of authority and power in the land. The title suggests that this ruler has achieved immortality through the use of magic or other means, and therefore, could have ruled for centuries or even millennia.",
 
+    // Common Sense
     "Concentration": "Improve your learning speed through practising intense concentration activities.",
     "Productivity": "Learn to procrastinate less at work and receive more job experience per day.",
     "Bargaining": "Study the tricks of the trade and persuasive skills to lower any type of expense.",
     "Meditation": "Fill your mind with peace and tranquility to tap into greater happiness from within.",
 
+    // Combat
     "Strength": "Condition your body and strength through harsh training. Stronger individuals are paid more in the military.",
     "Battle tactics": "Create and revise battle strategies, improving experience gained in the military.",
     "Muscle memory": "Strengthen your neurons through habit and repetition, improving strength gains throughout the body.",
@@ -1428,7 +1439,11 @@ gameData.requirements = {
     "Sophomore": new TaskRequirement([getTaskElement("Sophomore")], [{task: "Freshman", requirement: 10}]),
     "Junior": new TaskRequirement([getTaskElement("Junior")], [{task: "Sophomore", requirement: 10}]),
     "Senior": new TaskRequirement([getTaskElement("Senior")], [{task: "Junior", requirement: 10}]),
-    "Probation": new TaskRequirement([getTaskElement("Probation")], [{task: "Senior", requirement: 10}]),
+    "Research Candidate": new TaskRequirement([getTaskElement("Research Candidate")], [{task: "Senior", requirement: 25}]),
+    "Researcher": new TaskRequirement([getTaskElement("Researcher")], [{task: "Research Candidate", requirement: 25}]),
+    "Lead Researcher": new TaskRequirement([getTaskElement("Lead Researcher")], [{task: "Researcher", requirement: 25}]),
+    "Head of Innovation": new TaskRequirement([getTaskElement("Head of Innovation")], 
+					      [{task: "Concentration", requirement: 1000}, {task: "Meditation", requirement: 1000}, {task: "Productivity", requirement: "1500"}, {task: "Lead Researcher", requirement: 50}]),
 
     //Nobility
     "Baronet": new TaskRequirement([getTaskElement("Baronet")], [{task: "Elite knight", requirement: 10}]),
@@ -1464,8 +1479,8 @@ gameData.requirements = {
     //Mind
     //"Novel Knowledge": new TaskRequirement([getTaskElement("Novel Knowledge")], [{task: "Concentration", requirement: 700}, {task: "Meditation", requirement: 700}]),
     "Unusual Insight": new TaskRequirement([getTaskElement("Unusual Insight")], [{task: "Meditation", requirement: 900}, {task: "Novel Knowledge", requirement: 900}]),
-    "Trade Psychology": new TaskRequirement([getTaskElement("Trade Psychology")], [{task: "Unusual Insight", requirement: 900}, {task: "Probation", requirement: 40}]),
-    "Flow": new TaskRequirement([getTaskElement("Flow")], [{task: "Unusual Insight", requirement: 1500}, {task: "Probation", requirement: 40}]),
+    "Trade Psychology": new TaskRequirement([getTaskElement("Trade Psychology")], [{task: "Unusual Insight", requirement: 900}, {task: "Research Candidate", requirement: 40}]),
+    "Flow": new TaskRequirement([getTaskElement("Flow")], [{task: "Unusual Insight", requirement: 1500}, {task: "Research Candidate", requirement: 40}]),
     "Magical Engineering": new TaskRequirement([getTaskElement("Magical Engineering")], [{task: "Chairman", requirement: 1}]),
     "Scales Of Thought": new TaskRequirement([getTaskElement("Scales Of Thought")], [{task: "Chairman", requirement: 15}]),
     "Magical Biology": new TaskRequirement([getTaskElement("Magical Biology")], [{task: "Chairman", requirement: 150}]),
